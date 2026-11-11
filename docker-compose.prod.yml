@@ -1,0 +1,52 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+      DATABASE_URI: ${DATABASE_URI:?Set DATABASE_URI in Dokploy or the Compose environment}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?Set PAYLOAD_SECRET in Dokploy or the Compose environment}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL in Dokploy or the Compose environment}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in Dokploy or the Compose environment}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?Set NEXT_PUBLIC_SITE_URL in Dokploy or the Compose environment}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      CONTACT_TO: ${CONTACT_TO:-}
+      TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+      AUTH_SECRET: ${AUTH_SECRET:-}
+      AUTH_GOOGLE_ID: ${AUTH_GOOGLE_ID:-}
+      AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      CRON_SECRET: ${CRON_SECRET:-}
+    expose:
+      - "3000"
+    volumes:
+      - media_data:/app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-akarun}
+      POSTGRES_USER: ${POSTGRES_USER:-akarun}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in Dokploy or the Compose environment}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  media_data:
