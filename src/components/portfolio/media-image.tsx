@@ -1,6 +1,6 @@
-import Image from 'next/image'
 import type { ReactNode } from 'react'
 
+import { CdnImage } from '@/components/portfolio/cdn-image'
 import type { Media } from '@/payload-types'
 import { cn } from 'cn'
 
@@ -38,7 +38,8 @@ export function MediaImage({
         className,
       )}
     >
-      <Image
+      <CdnImage
+        cloudflare={process.env.CLOUDFLARE_IMAGES === 'true'}
         src={media.url}
         alt={alt ?? media.alt}
         width={media.width ?? 1200}

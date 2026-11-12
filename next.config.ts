@@ -28,6 +28,11 @@ const nextConfig: NextConfig = {
     ]
   },
   images: {
+    // Optimized images are cached for a year in browsers and at the edge; media URLs change when a file is replaced.
+    minimumCacheTTL: 31536000,
+    qualities: [75],
+    deviceSizes: [640, 828, 1200, 1920],
+    imageSizes: [64, 256, 384],
     localPatterns: [
       {
         pathname: '/api/media/file/**',

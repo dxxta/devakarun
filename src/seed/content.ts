@@ -311,8 +311,8 @@ export async function seedContent(payload: Payload): Promise<void> {
         paragraph("I'm a Software Engineer with experience in Frontend, Backend, Mobile and ML/IoT integration. Informatics Engineering graduate (B.Inf) from University of Mataram, based in Lombok, Indonesia."),
         heading('Experience'),
         bulletList([
-          'Batii Prohire, Fullstack Contract Based (2 Feb 2026 - Present): migrated existing modules into a new integrated micro frontend app using Angular, and used C# to build an API-based app with a PostgreSQL database.',
-          'Batii Prohire, Fullstack Contract Based (Jan - Dec 2025): migrated existing modules into a new integrated micro frontend app using Angular.',
+          'Batii, Fullstack Contract Based (2 Feb 2026 - Present): migrated existing modules into a new integrated micro frontend app using Angular, and used C# to build an API-based app with a PostgreSQL database.',
+          'Batii, Fullstack Contract Based (Jan - Dec 2025): migrated existing modules into a new integrated micro frontend app using Angular.',
           'PT Hayookerja Abhinaya Indonesia, Web-Dev (Jan 2022 - Dec 2025): managed the company landing page and Human Resource Information System (HRIS) application. Started as frontend developer and was promoted to backend developer in early 2025.',
           'Bangkit Academy led by Google, Tokopedia, Gojek and Traveloka (Feb - June 2024): Android developer at Edusign team (Bangkit cohort) using Jetpack Compose with integrated machine learning and RESTful API; the app helps people understand American Sign Language.',
           'Kedaireka Halal Tourism, Fullstack Web-Dev (Aug - Dec 2023): web application with integrated RESTful API and payment gateway for Lombok Halal Room, a platform used for halal tourism.',

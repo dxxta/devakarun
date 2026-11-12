@@ -42,6 +42,7 @@ service hostname `postgres`, and its database, username, and password must match
 | `ADMIN_PASSWORD` | Yes | Owner's Payload admin password (at least 12 characters). |
 | `NEXT_PUBLIC_SITE_URL` | Yes | Set to `https://dev.akarun.site`. |
 | `BLOCK_AI_CRAWLERS` | Optional | Defaults to `true`; set to `false` to disable request blocking for automated AI crawlers. The `robots.txt` rules remain active. |
+| `CLOUDFLARE_IMAGES` | Optional | Set to `true` to resize images through Cloudflare (see Cloudflare images below). Unset or `false` keeps the built-in Next.js optimizer. No API token is needed. |
 | `SMTP_HOST` | Optional | Outgoing mail server hostname. Leave blank to use the console adapter. |
 | `SMTP_PORT` | Optional | SMTP port; commonly `587` with STARTTLS or `465` with TLS. |
 | `SMTP_USER` | Optional | SMTP login name, if required by the mail server. |
@@ -61,6 +62,22 @@ The app requires all six variables marked Yes for startup. Add SMTP,
 Turnstile, and Google OAuth values when enabling those features. The Docker
 image uses non-secret placeholders only while compiling; production runtime
 values come from Dokploy.
+
+## Cloudflare images (optional)
+
+Cloudflare can resize and cache images at the edge. It is off unless
+`CLOUDFLARE_IMAGES=true` is set in Dokploy's Environment tab (no rebuild needed).
+
+1. Proxy `dev.akarun.site` in Cloudflare DNS (orange cloud) and set SSL/TLS to **Full (strict)**.
+2. In Cloudflare, open Images > Transformations and enable it for the zone.
+3. Add a Cache Rule that caches `/cdn-cgi/image/*` and `/api/media/file/*` at the edge for a month.
+4. Set `CLOUDFLARE_IMAGES=true` and redeploy.
+
+The free plan allows 5,000 unique transformations a month. Once it is used up,
+new transformations fail with error 9422 while already cached ones keep working.
+The page then falls back to the built-in Next.js optimizer for the rest of that
+visit. Its responses carry a one-year cache lifetime, so browsers keep each image
+after the first load. Check the edge cache with the `cf-cache-status` response header.
 
 ## 3. Apply Payload migrations
 

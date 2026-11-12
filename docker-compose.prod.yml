@@ -25,6 +25,7 @@ services:
       SEED_CONTENT: ${SEED_CONTENT:-}
       BLOCK_AI_CRAWLERS: ${BLOCK_AI_CRAWLERS:-true}
       SKIP_GITHUB_SYNC: ${SKIP_GITHUB_SYNC:-}
+      CLOUDFLARE_IMAGES: ${CLOUDFLARE_IMAGES:-}
     expose:
       - "3000"
     volumes:
