@@ -43,6 +43,7 @@ service hostname `postgres`, and its database, username, and password must match
 | `ADMIN_EMAIL` | Yes | Owner's Payload admin login email. |
 | `ADMIN_PASSWORD` | Yes | Owner's Payload admin password (at least 12 characters). |
 | `NEXT_PUBLIC_SITE_URL` | Yes | Set to `https://dev.akarun.site`. |
+| `BLOCK_AI_CRAWLERS` | Optional | Defaults to `true`; set to `false` to disable request blocking for automated AI crawlers. The `robots.txt` rules remain active. |
 | `SMTP_HOST` | Optional | Outgoing mail server hostname. Leave blank to use the console adapter. |
 | `SMTP_PORT` | Optional | SMTP port; commonly `587` with STARTTLS or `465` with TLS. |
 | `SMTP_USER` | Optional | SMTP login name, if required by the mail server. |
