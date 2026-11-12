@@ -290,6 +290,12 @@ export async function seedContent(payload: Payload): Promise<void> {
     'Mochammad Dinta Alif Syaifuddin portfolio PDF',
     path.join('portfolio', 'Mochammad-Dinta-Alif-Syaifuddin-Portfolio.pdf'),
   )
+  const avatar = await upsertSeedMedia(
+    payload,
+    'avatar.jpeg',
+    'Dinta Syaifuddin avatar',
+    path.join('portfolio', 'avatar.jpeg'),
+  )
   const previewAssets = {
     lks: await upsertSeedMedia(payload, 'lks-ntb-2021.png', 'LKS SMK Provincial NTB 2021 2nd place certificate', path.join('certificates', 'lks-ntb-2021.png')),
     bangkit: await upsertSeedMedia(payload, 'bangkit-mobile-dev.jpeg', 'Certificate of Completion as Mobile Dev Cohort - Bangkit Academy certificate', path.join('certificates', 'bangkit-mobile-dev.jpeg')),
@@ -332,6 +338,7 @@ export async function seedContent(payload: Payload): Promise<void> {
         { keyword: 'Bangkit Academy', image: previewAssets.bangkit.id, label: 'Bangkit Academy Mobile Developer Cohort certificate' },
         { keyword: 'CV Tech Solution', image: previewAssets.tec.id, label: 'CV. TEC Solution project work certificate' },
       ],
+      avatar: avatar.id,
       portfolioPdf: portfolioPdf.id,
     },
     overrideAccess: true,
