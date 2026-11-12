@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="dev.akarun">
+  <rect width="64" height="64" rx="18" fill="#d4f03c"/>
+  <path fill="#151513" fill-rule="evenodd" d="M15 24h25V15h9v34h-9v-3H15V24Zm8 6h13v13H23V30Z"/>
+  <circle cx="53" cy="11" r="4.5" fill="#a87d55"/>
+</svg>

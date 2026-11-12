@@ -15,6 +15,13 @@ export const metadata: Metadata = {
   title: { default: 'dev.akarun', template: '%s | dev.akarun' },
   description: 'A personal site and blog by dev.akarun.',
   openGraph: { siteName: 'dev.akarun' },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any', type: 'image/x-icon' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/icon-192.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

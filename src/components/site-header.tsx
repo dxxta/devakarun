@@ -7,6 +7,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { SearchDrawer } from '@/components/search/search-drawer'
+import { Wordmark } from '@/components/brand/wordmark'
 
 const links = [
   { href: '/about', label: 'About' },
@@ -82,10 +83,10 @@ export function SiteHeader() {
     <header className="flex min-h-16 items-center justify-between gap-3 rounded-full border-2 border-border bg-card px-4 shadow-hard md:px-6">
       <Link
         aria-label="dev.akarun home"
-        className="shrink-0 font-display text-2xl font-extrabold tracking-[-0.055em]"
+        className="shrink-0"
         href="/"
       >
-        dev<span className="text-primary">.</span>akarun
+        <Wordmark className="h-8 w-auto" />
       </Link>
 
       <nav aria-label="Main navigation" className="hidden items-center gap-6 md:flex">
