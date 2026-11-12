@@ -14,6 +14,7 @@ import { engagementCollections } from './collections/engagement'
 import { migrations } from './migrations'
 import { env } from './lib/env'
 import { createPayloadEmailAdapter } from './lib/email'
+import { logFeatureStatus } from './lib/feature-status'
 import { seedAdmin } from './seed/admin'
 import { seedContentIfEmpty } from './seed/bootstrap'
 
@@ -55,6 +56,7 @@ export default buildConfig({
   sharp,
   plugins: [searchPlugin({ collections: ['posts', 'projects'] })],
   onInit: async (payload) => {
+    logFeatureStatus(payload)
     await seedAdmin(payload)
     try {
       await seedContentIfEmpty(payload)
