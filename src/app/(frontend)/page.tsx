@@ -12,11 +12,11 @@ export default function HomePage() {
       <Suspense fallback={<LoadingState label="Loading profile…" variant="text" />}>
         <ProfileHero />
       </Suspense>
-      <Suspense fallback={<LoadingState label="Loading featured projects…" variant="cards" />}>
-        <ProjectsGrid featuredOnly heading="Featured projects" />
-      </Suspense>
       <Suspense fallback={<LoadingState label="Loading featured showcase…" variant="cards" />}>
         <PortfolioShowcaseSection featuredOnly />
+      </Suspense>
+      <Suspense fallback={<LoadingState label="Loading featured projects…" variant="cards" />}>
+        <ProjectsGrid featuredOnly heading="Featured projects" />
       </Suspense>
     </div>
   )
