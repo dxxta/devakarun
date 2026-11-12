@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import Image from 'next/image'
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { getPayload } from 'payload'
@@ -9,15 +10,35 @@ import { estimateReadingMinutes } from '@/lib/seo'
 import { Badge } from '@/components/ui/badge'
 import { ErrorState } from '@/components/states/error-state'
 import { LoadingState } from '@/components/states/loading-state'
+import { LivePreviewListener } from '@/components/blog/live-preview-listener'
 import { CommentsSection } from '@/components/comments/comments-section'
 import type { Post } from '@/payload-types'
 
 export const dynamic = 'force-dynamic'
 
-type PostPageProps = { params: Promise<{ slug: string }> }
+type PostPageProps = {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ preview?: string }>
+}
 
-async function getPublishedPost(slug: string): Promise<Post | null> {
+async function getPublishedPost(slug: string, preview = false): Promise<Post | null> {
   const payload = await getPayload({ config })
+  if (preview) {
+    // Drafts are only shown to a signed-in admin (the Live Preview iframe shares the admin session).
+    const { user } = await payload.auth({ headers: await headers() })
+    if (user) {
+      const { docs } = await payload.find({
+        collection: 'posts',
+        where: { slug: { equals: slug } },
+        draft: true,
+        depth: 2,
+        limit: 1,
+        overrideAccess: false,
+        user,
+      })
+      return docs[0] ?? null
+    }
+  }
   const { docs } = await payload.find({
     collection: 'posts',
     where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
@@ -38,11 +59,12 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   }
 }
 
-export default async function BlogPostPage({ params }: PostPageProps) {
+export default async function BlogPostPage({ params, searchParams }: PostPageProps) {
   const { slug } = await params
+  const preview = (await searchParams).preview === 'true'
   let post: Post | null
   try {
-    post = await getPublishedPost(slug)
+    post = await getPublishedPost(slug, preview)
   } catch {
     return <ErrorState message="Refresh the page to try loading this post again." title="This post could not load" />
   }
@@ -53,6 +75,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
 
   return (
     <article className="mx-auto max-w-3xl space-y-8">
+      {preview ? <LivePreviewListener /> : null}
       <header className="space-y-5">
         {post.categories?.length ? <div className="flex flex-wrap gap-2">{post.categories.map((item) => typeof item === 'object' && item ? <Badge key={item.id} variant="secondary">{item.name}</Badge> : null)}</div> : null}
         <h1 className="m-0 text-balance font-display text-4xl font-extrabold sm:text-5xl">{post.title}</h1>

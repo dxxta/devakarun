@@ -24,6 +24,8 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { SyncButton as SyncButton_1ad0854c8ffe8541a380fc3d55d125ac } from '../../../components/admin/sync-button'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
+import { AdminIcon as AdminIcon_57ef2d197ad87913c2eec929f08d82cf } from '../../../components/admin/admin-icon'
+import { AdminLogo as AdminLogo_ec43c518656dcf446e1b4f896c9e4fab } from '../../../components/admin/admin-logo'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -54,5 +56,7 @@ export const importMap = {
   "/components/admin/sync-button#SyncButton": SyncButton_1ad0854c8ffe8541a380fc3d55d125ac,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
+  "/components/admin/admin-icon#AdminIcon": AdminIcon_57ef2d197ad87913c2eec929f08d82cf,
+  "/components/admin/admin-logo#AdminLogo": AdminLogo_ec43c518656dcf446e1b4f896c9e4fab,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

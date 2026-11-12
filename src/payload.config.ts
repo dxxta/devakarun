@@ -23,6 +23,17 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Users.slug,
+    meta: {
+      titleSuffix: '- dev.akarun',
+      icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' }],
+      openGraph: { siteName: 'dev.akarun' },
+    },
+    components: {
+      graphics: {
+        Logo: '/components/admin/admin-logo#AdminLogo',
+        Icon: '/components/admin/admin-icon#AdminIcon',
+      },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },

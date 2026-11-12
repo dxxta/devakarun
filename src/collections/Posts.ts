@@ -10,7 +10,10 @@ export const Posts: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'publishedAt', '_status', 'updatedAt'],
-    preview: (doc) => `/blog/${String(doc.slug ?? '')}`,
+    preview: (doc) => `/blog/${String(doc.slug ?? '')}?preview=true`,
+    livePreview: {
+      url: ({ data }) => `/blog/${String(data.slug ?? '')}?preview=true`,
+    },
   },
   access: {
     read: ({ req }) => req.user ? true : { _status: { equals: 'published' } },
@@ -26,7 +29,7 @@ export const Posts: CollectionConfig = {
       },
     ],
   },
-  versions: { drafts: true },
+  versions: { drafts: { autosave: { interval: 400 } } },
   fields: [
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true, unique: true, index: true },
