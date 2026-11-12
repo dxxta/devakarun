@@ -115,10 +115,12 @@ transactional email:
 
 ## 6. GitHub-backed projects and scheduled sync
 
-On first boot, the app seeds the seven resume projects and one new Slipakar
-project. Byecheating, FundConn, and ColorSorter are linked to GitHub with their
-resume text protected; Slipakar's title, summary, and description come from its
-repository. All four sync repository metadata, language, topics, and optional
+On first boot, the app seeds the seven resume projects plus Slipakar and
+Notakar. Byecheating, FundConn, and ColorSorter are linked to GitHub with their
+resume text protected; Slipakar's title is protected while its other project
+details come from its repository. Notakar is linked to GitHub and starts
+unhighlighted. All five GitHub-backed projects sync repository metadata,
+language, topics, and optional
 `docs/demos/` images. To add another project, open `/admin`, create a project, set Source to
 `github`, enter `owner/name` in GitHub repo, and click "Sync from GitHub".
 Screenshots in `docs/demos/` can be PNG, JPG/JPEG, WebP, or GIF; the first image
@@ -174,10 +176,11 @@ and representative media URLs.
 
 On first boot in development and production, after the admin account is seeded,
 the app automatically seeds the portfolio when Tech Stack is empty and the
-Profile global has no name. This includes the profile, 26 technologies, 12
-certificates and images, and eight projects (four GitHub-backed); startup then
-syncs their GitHub data. Set `SEED_CONTENT=false` to disable the first-boot seed. Existing
-content is not overwritten on later boots; edit it in `/admin`. To intentionally
+Profile global has no name. This includes the profile, 28 technologies, 16
+certificates and images, nine projects (five GitHub-backed), eight showcase
+pages, and the merged portfolio PDF; startup then syncs GitHub project data.
+Set `SEED_CONTENT=false` to disable the first-boot seed. Existing content is
+not overwritten on later boots; edit it in `/admin`. To intentionally
 reapply the portfolio upsert, run `pnpm payload run src/seed/run.ts`. Blog sample
 content is manual only and is not part of startup seeding.
 

@@ -11,10 +11,11 @@ docker compose up -d postgres
 pnpm dev                      # http://localhost:3000  (admin: /admin)
 ```
 
-The portfolio (profile, tech stack, certificates with images, and eight
-projects, including four GitHub-backed projects) seeds and syncs automatically
-on the first boot in development and production. Set `SEED_CONTENT=false` to disable first-boot
-seeding. To reapply the portfolio upsert manually, run
+The portfolio (profile, 28 technologies, 16 certificates with images, nine
+projects, eight showcase pages, and the merged portfolio PDF) seeds and syncs
+automatically on the first boot in development and production. Set
+`SEED_CONTENT=false` to disable first-boot seeding. To reapply the portfolio
+upsert manually, run
 `pnpm payload run src/seed/run.ts`. Blog sample content is manual only:
 `pnpm payload run src/seed/run-blog.ts`.
 

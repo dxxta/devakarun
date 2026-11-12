@@ -1,7 +1,5 @@
 # Local development
 
-For the public site's brand, UI tokens, components, and accessibility patterns, see [branding.md](branding.md).
-
 ## Requirements
 - Node.js 22+ (`node -v`)
 - pnpm 9+ (`corepack enable` or `npm i -g pnpm`)
@@ -51,11 +49,12 @@ pnpm dev
 
 On first app boot, the portfolio content is seeded automatically in development
 and production when the Tech Stack collection is empty and the Profile global
-has no name. The seed creates the profile, 26 technologies, 15 certificates
-with their certificate images, and eight projects: the seven resume projects
-plus Slipakar. Byecheating, FundConn, ColorSorter, and Slipakar are
-GitHub-backed; the app syncs their repo data while retaining resume copy for
-the first three. `SEED_CONTENT=false` disables this first-boot seed.
+has no name. The seed creates the profile, 28 technologies, 16 certificates
+with their certificate images, nine projects, eight showcase pages, and the
+merged portfolio PDF. Byecheating, FundConn, ColorSorter, Slipakar, and Notakar
+are GitHub-backed; the app syncs their repo data while retaining resume copy
+for the three linked resume projects. `SEED_CONTENT=false` disables this
+first-boot seed.
 Afterward, make content changes in `/admin`; existing content is not overwritten
 on later boots. Blog sample content remains manual only.
 
@@ -67,8 +66,8 @@ pnpm payload run src/seed/run.ts
 ```
 
 The portfolio seed is idempotent and upserts the profile, technologies,
-certificates, and all eight projects. Run the GitHub sync endpoint to refresh
-repository data after a manual seed. Blog content has a separate manual seed:
+certificates, projects, showcase pages, and portfolio PDF. Run the GitHub sync
+endpoint to refresh repository data after a manual seed. Blog content has a separate manual seed:
 
 ```bash
 pnpm payload run src/seed/run-blog.ts
