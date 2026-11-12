@@ -9,21 +9,19 @@ The Compose stack contains the standalone Next.js app and a private PostgreSQL
 
 1. Point the DNS record for `dev.akarun.site` at the VPS running Dokploy.
 2. In Dokploy, create a Compose application from this repository and select
-   `docker-compose.prod.yml` as its Compose file. Dokploy can use this file
-   directly; set the variables in the next section in the application's
-   environment settings. Provide the Compose project with a private
-   repository-root `.env.production` file containing those values; never commit
-   that file.
+   `docker-compose.prod.yml` as its Compose file. Set the variables in the next
+   section in the application's Environment tab. Dokploy provides them for
+   Compose substitutions; no repository `.env.production` file is required.
 3. Configure Dokploy's Traefik domain for `dev.akarun.site`, target the `app`
    service on port `3000`, and enable Let's Encrypt/HTTPS. Force HTTPS after the
    certificate is ready.
 4. Keep the `postgres` service internal. It has no published host port; the app
    connects to it using `postgres:5432` on the Compose network.
 
-The Compose `env_file` reads `.env.production` inside the deployment. Required
-Compose substitutions are also set as Dokploy application variables. For a
-manual Compose deployment, create an untracked `.env.production` and invoke
-Compose with `--env-file .env.production` so those substitutions are available.
+Dokploy's Environment tab provides Compose substitutions, which the Compose
+file forwards to the app and database services. For a manual Compose
+deployment, create an untracked `.env.production` and invoke Compose with
+`--env-file .env.production` so those substitutions are available.
 
 ## 2. Configure environment variables
 
@@ -185,8 +183,8 @@ reapply the portfolio upsert, run `pnpm payload run src/seed/run.ts`. Blog sampl
 content is manual only and is not part of startup seeding.
 
 - [ ] DNS for `dev.akarun.site` points to the Dokploy VPS.
-- [ ] Dokploy uses `docker-compose.prod.yml` and all required environment values
-      are set; `.env.production` is not committed.
+- [ ] Dokploy uses `docker-compose.prod.yml` and all required values are set in
+      the application's Environment tab.
 - [ ] `DATABASE_URI` points to `postgres:5432` and matches the PostgreSQL
       database/user/password settings.
 - [ ] PostgreSQL reports healthy and the initial Payload migration has run.
