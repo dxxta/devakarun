@@ -1,13 +1,17 @@
 import path from 'node:path'
 import type { Payload } from 'payload'
 
-import type { Certificate, Profile, Project, TechStack } from '../payload-types'
+import type { Certificate, Media, PortfolioShowcase, Profile, Project, TechStack } from '../payload-types'
 
 type TechStackSeed = Pick<TechStack, 'name' | 'category' | 'order'>
 type ProjectSeed = Pick<
   Project,
-  'title' | 'slug' | 'summary' | 'description' | 'techStack' | 'featured' | 'order' | 'source' | 'githubRepo' | 'repoUrl' | 'lockedFields'
+  'title' | 'slug' | 'summary' | 'description' | 'features' | 'architecture' | 'techStack' | 'featured' | 'order' | 'source' | 'githubRepo' | 'repoUrl' | 'lockedFields'
 >
+type ShowcaseSeed = Pick<PortfolioShowcase, 'title' | 'order' | 'caption' | 'featured'> & {
+  imageFile: string
+  projectSlug: string | null
+}
 type CertificateSeed = Pick<Certificate, 'title' | 'issuer' | 'issueDate' | 'order' | 'highlighted'> & {
   expiryDate?: string
   credentialUrl?: string
@@ -69,19 +73,12 @@ async function upsertTechStackItem(payload: Payload, data: TechStackSeed): Promi
 }
 
 async function upsertCertificate(payload: Payload, certificate: CertificateSeed): Promise<void> {
-  const media = await payload.find({
-    collection: 'media',
-    where: { filename: { equals: certificate.imageFile } },
-    limit: 1,
-    overrideAccess: true,
-    showHiddenFields: true,
-  })
-  const image = media.docs[0] ?? await payload.create({
-    collection: 'media',
-    data: { alt: `${certificate.title} certificate` },
-    filePath: path.join(process.cwd(), 'seed-assets', 'certificates', certificate.imageFile),
-    overrideAccess: true,
-  })
+  const image = await upsertSeedMedia(
+    payload,
+    certificate.imageFile,
+    `${certificate.title} certificate`,
+    path.join('certificates', certificate.imageFile),
+  )
   const data = {
     title: certificate.title,
     issuer: certificate.issuer,
@@ -101,6 +98,29 @@ async function upsertCertificate(payload: Payload, certificate: CertificateSeed)
     return
   }
   await payload.create({ collection: 'certificates', data, overrideAccess: true })
+}
+
+async function upsertSeedMedia(
+  payload: Payload,
+  filename: string,
+  alt: string,
+  relativePath: string,
+): Promise<Media> {
+  const media = await payload.find({
+    collection: 'media',
+    where: { filename: { equals: filename } },
+    limit: 1,
+    overrideAccess: true,
+    showHiddenFields: true,
+  })
+  if (media.docs[0]) return media.docs[0]
+
+  return payload.create({
+    collection: 'media',
+    data: { alt },
+    filePath: path.join(process.cwd(), 'seed-assets', relativePath),
+    overrideAccess: true,
+  })
 }
 
 async function upsertProject(payload: Payload, data: ProjectSeed): Promise<void> {
@@ -125,10 +145,10 @@ async function upsertProject(payload: Payload, data: ProjectSeed): Promise<void>
   await payload.create({ collection: 'projects', data, overrideAccess: true })
 }
 
-async function deleteByField<K extends 'tech-stack' | 'certificates'>(
+async function deleteByField<K extends 'tech-stack' | 'certificates' | 'projects'>(
   payload: Payload,
   collection: K,
-  field: K extends 'tech-stack' ? 'name' : 'title',
+  field: K extends 'tech-stack' ? 'name' : K extends 'certificates' ? 'title' : 'slug',
   values: string[],
 ): Promise<void> {
   for (const value of values) {
@@ -142,6 +162,46 @@ async function deleteByField<K extends 'tech-stack' | 'certificates'>(
       await payload.delete({ collection, id: document.id, overrideAccess: true })
     }
   }
+}
+
+async function upsertShowcase(payload: Payload, showcase: ShowcaseSeed): Promise<void> {
+  const image = await upsertSeedMedia(
+    payload,
+    showcase.imageFile,
+    `${showcase.title} portfolio showcase`,
+    path.join('showcases', showcase.imageFile),
+  )
+  let projectID: number | null = null
+  if (showcase.projectSlug) {
+    const project = await payload.find({
+      collection: 'projects',
+      where: { slug: { equals: showcase.projectSlug } },
+      limit: 1,
+      overrideAccess: true,
+    })
+    if (!project.docs[0]) throw new Error(`Missing project for showcase: ${showcase.projectSlug}`)
+    projectID = project.docs[0].id
+  }
+
+  const data = {
+    title: showcase.title,
+    order: showcase.order,
+    caption: showcase.caption,
+    featured: showcase.featured,
+    image: image.id,
+    project: projectID,
+  }
+  const existing = await payload.find({
+    collection: 'portfolio-showcases',
+    where: { title: { equals: showcase.title } },
+    limit: 1,
+    overrideAccess: true,
+  })
+  if (existing.docs[0]) {
+    await payload.update({ collection: 'portfolio-showcases', id: existing.docs[0].id, data, overrideAccess: true })
+    return
+  }
+  await payload.create({ collection: 'portfolio-showcases', data, overrideAccess: true })
 }
 
 const techSeeds: TechStackSeed[] = [
@@ -161,6 +221,8 @@ const techSeeds: TechStackSeed[] = [
   { name: 'MySQL', category: 'backend', order: 140 },
   { name: 'GitLab', category: 'devops', order: 150 },
   { name: 'GitHub', category: 'devops', order: 160 },
+  { name: 'Google Cloud', category: 'devops', order: 170 },
+  { name: 'Cloudflare', category: 'devops', order: 180 },
   { name: 'Figma', category: 'tools', order: 170 },
   { name: 'Balsamiq', category: 'tools', order: 180 },
   { name: 'Jest', category: 'tools', order: 190 },
@@ -175,6 +237,7 @@ const techSeeds: TechStackSeed[] = [
 
 // Verify Dicoding certificate identifiers in a browser; some URLs may use O or 0.
 const certificates: CertificateSeed[] = [
+  { title: '2nd Place, LKS SMK Provincial NTB 2021 - IT Software Solutions for Business', issuer: 'Dinas Pendidikan dan Kebudayaan Provinsi NTB', issueDate: '2021-09-02T00:00:00.000Z', imageFile: 'lks-ntb-2021.png', order: 0, highlighted: false },
   { title: 'Kotlin Android Intermediate', issuer: 'Dicoding Indonesia', issueDate: '2024-06-18T00:00:00.000Z', expiryDate: '2027-06-18T00:00:00.000Z', credentialUrl: 'https://www.dicoding.com/certificates/MRZME6N9LPYQ', imageFile: 'dicoding-android-intermediate.jpeg', order: 10, highlighted: false },
   { title: 'Machine Learning Implementation For Kotlin Android', issuer: 'Dicoding Indonesia', issueDate: '2024-05-02T00:00:00.000Z', expiryDate: '2027-05-02T00:00:00.000Z', credentialUrl: 'https://www.dicoding.com/certificates/NVP7Q9GQOZR0', imageFile: 'dicoding-ml-android.jpeg', order: 20, highlighted: false },
   { title: 'AI Fundamentals', issuer: 'Dicoding Indonesia', issueDate: '2024-04-19T00:00:00.000Z', expiryDate: '2027-04-19T00:00:00.000Z', credentialUrl: 'https://www.dicoding.com/certificates/07Z605VKJZQR', imageFile: 'dicoding-ai-basics.jpeg', order: 30, highlighted: false },
@@ -189,11 +252,16 @@ const certificates: CertificateSeed[] = [
   { title: 'Red Hat System Administration I (RH124)', issuer: 'Texas A&M Red Hat Academy', issueDate: '2023-12-29T00:00:00.000Z', imageFile: 'redhat-rh124.png', order: 120, highlighted: true },
   // The dates on these two practicum certificates are approximate; the owner should verify them in /admin.
   { title: 'Practicum Assistant, Digital Image Processing (Even Semester 2023/2024)', issuer: 'Informatics Engineering Study Program, University of Mataram', issueDate: '2024-06-30T00:00:00.000Z', imageFile: 'unram-practicum-image-processing.jpeg', order: 130, highlighted: false },
-  { title: 'Practicum Assistant, Algorithms and Data Structures (Odd Semester 2023/2024)', issuer: 'Informatics Engineering Study Program, University of Mataram', issueDate: '2024-01-11T00:00:00.000Z', imageFile: 'unram-practicum-data-structures.jpeg', order: 140, highlighted: false },
+  { title: 'Practicum Assistant, Algorithms and Data Structures (Odd Semester 2023/2024)', issuer: 'Informatics Engineering Study Program, University of Mataram', issueDate: '2024-01-11T00:00:00.000Z', imageFile: 'unram-practicum-data-structures.jpeg', order: 140, highlighted: true },
   { title: 'Project Work Certificate (PKL Replacement), CV. TEC Solution', issuer: 'CV. TEC Solution', issueDate: '2020-10-20T00:00:00.000Z', imageFile: 'tec-solution-pkl-2020.jpeg', order: 150, highlighted: false },
 ]
 
 export async function seedContent(payload: Payload): Promise<void> {
+  await deleteByField(payload, 'projects', 'slug', [
+    'portfolio-starter',
+    'content-hub',
+    'delivery-toolkit',
+  ])
   await deleteByField(payload, 'certificates', 'title', [
     'Sample Certificate in Web Development',
     'Sample Certificate in Cloud Fundamentals',
@@ -216,13 +284,25 @@ export async function seedContent(payload: Payload): Promise<void> {
     overrideAccess: true,
   })
 
+  const portfolioPdf = await upsertSeedMedia(
+    payload,
+    'Mochammad-Dinta-Alif-Syaifuddin-Portfolio.pdf',
+    'Mochammad Dinta Alif Syaifuddin portfolio PDF',
+    path.join('portfolio', 'Mochammad-Dinta-Alif-Syaifuddin-Portfolio.pdf'),
+  )
+  const previewAssets = {
+    lks: await upsertSeedMedia(payload, 'lks-ntb-2021.png', 'LKS SMK Provincial NTB 2021 2nd place certificate', path.join('certificates', 'lks-ntb-2021.png')),
+    bangkit: await upsertSeedMedia(payload, 'bangkit-mobile-dev.jpeg', 'Certificate of Completion as Mobile Dev Cohort - Bangkit Academy certificate', path.join('certificates', 'bangkit-mobile-dev.jpeg')),
+    tec: await upsertSeedMedia(payload, 'tec-solution-pkl-2020.jpeg', 'Project Work Certificate (PKL Replacement), CV. TEC Solution certificate', path.join('certificates', 'tec-solution-pkl-2020.jpeg')),
+  }
+
   await payload.updateGlobal({
     slug: 'profile',
     data: {
       name: 'Dinta Syaifuddin',
       headline: 'Self Hosted Software Engineer',
       bio: richText([
-        paragraph("I'm a Self Hosted Software Engineer with experience in Frontend, Backend, Mobile and ML/IoT integration. Informatics Engineering graduate (B.Inf, GPA 3.70) from University of Mataram, based in Lombok, Indonesia."),
+        paragraph("I'm a Software Engineer with experience in Frontend, Backend, Mobile and ML/IoT integration. Informatics Engineering graduate (B.Inf) from University of Mataram, based in Lombok, Indonesia."),
         heading('Experience'),
         bulletList([
           'Batii Prohire, Fullstack Contract Based (2 Feb 2026 - Present): migrated existing modules into a new integrated micro frontend app using Angular, and used C# to build an API-based app with a PostgreSQL database.',
@@ -234,7 +314,7 @@ export async function seedContent(payload: Payload): Promise<void> {
         ]),
         heading('Education'),
         bulletList([
-          'University of Mataram, Informatics Engineering (graduated Aug 2025), Bachelor of Informatics Engineering (B.Inf), GPA 3.70.',
+          'University of Mataram, Informatics Engineering (graduated Aug 2025), Bachelor of Informatics Engineering (B.Inf).',
           'SMKN 2 Mataram, Computer Software Engineering (Aug 2021).',
         ]),
         heading('Achievements'),
@@ -247,6 +327,12 @@ export async function seedContent(payload: Payload): Promise<void> {
         { label: 'LinkedIn', url: 'https://www.linkedin.com/in/dinta-syaifuddin' },
         { label: 'Email', url: 'mailto:dintasyaifuddin@gmail.com' },
       ],
+      listPreviews: [
+        { keyword: 'LKS', image: previewAssets.lks.id, label: 'LKS SMK Provincial NTB 2021 2nd place certificate' },
+        { keyword: 'Bangkit Academy', image: previewAssets.bangkit.id, label: 'Bangkit Academy Mobile Developer Cohort certificate' },
+        { keyword: 'CV Tech Solution', image: previewAssets.tec.id, label: 'CV. TEC Solution project work certificate' },
+      ],
+      portfolioPdf: portfolioPdf.id,
     },
     overrideAccess: true,
   })
@@ -269,12 +355,46 @@ export async function seedContent(payload: Payload): Promise<void> {
 
   const projects: ProjectSeed[] = [
     {
-      title: 'Slipakar',
+      title: 'Slipakar: Self-hostable platform for personalized bulk email payslip',
       slug: 'slipakar',
-      summary: 'Syncing details from GitHub.',
-      description: richText([paragraph(' ')]) as Project['description'],
+      summary: 'Slipakar is an open-source, self-hostable platform for personalized bulk email. It lets a company send messages through its own SMTP server and optionally attach a personalized PDF, such as an employee payslip, to each recipient',
+      description: richText([paragraph('Slipakar is an open-source, self-hostable platform for personalized bulk email. It lets a company send messages through its own SMTP server and optionally attach a personalized PDF, such as an employee payslip, to each recipient. The primary use case is HR, finance, or operations uploading a spreadsheet, mapping its columns to a reusable email or PDF template, previewing the result, and sending a campaign without writing code.')]) as Project['description'],
+      features: [
+        { title: 'Projects, SMTP & Templates', text: 'Projects organize SMTP connections, email templates, uploads, PDF templates, and campaigns. SMTP credentials are configured per project and encrypted at rest with APPENCRYPTIONKEY (never returned in API views). Email templates use safe {{placeholder}} substitution without evaluat' },
+        { title: 'Data Upload, Mapping & PDF Builder', text: 'Upload recipient data from CSV, XLSX, or JSON files and map columns to template placeholders. Build personalized PDF templates using a visual node builder (text, table, image, and divider nodes); generated PDFs and extra shared attachments are stored in Garage.' },
+        { title: 'Campaigns', text: 'Queued through RabbitMQ and sent asynchronously in the background with Redis token-bucket rate limiting per SMTP connection, per-recipient status tracking, and automatic retries for transient SMTP failures.' },
+        { title: 'Notifications & Announcements', text: 'Campaign notifications (campaignfinished, sendfailed) and admin announcements (UserNotice from broadcasts) appear in the user app with unread badges.' },
+        { title: 'User Profile & Theme Preferences', text: 'Users can edit their display name, upload or reset a custom avatar (PNG/JPEG/WebP up to 2 MB, magic-byte verified, stored in Garage), and change their email address (always requires clicking a verification link sent to the new address). Account-saved theme preferences support lig' },
+        { title: 'Login Activity', text: 'Records sign-in events with resolved client IP, a best-effort proxy indicator, parsed browser/OS/device type, and offline geolocation via geoip-lite ( retained for LOGINEVENTRETENTION_DAYS, default 90 days). Optional map previews load OpenStreetMap raster tiles on demand only whe' },
+        { title: 'Admin Web', text: 'Manage users (view, edit name/image, disable/enable accounts with immediate session revocation), compose and send broadcasts to all users, by role, or selected users, audit login activity across all accounts, toggle instance feature flags (scalardocs, pdfbuilder, self_signup), vi' },
+        { title: 'OpenAPI & Observability', text: 'Scalar OpenAPI reference at /docs and specification at /openapi.json (requires authentication; toggleable via scalar_docs). Prometheus scrapes /metrics for Grafana dashboards, Uptime Kuma monitors service health, API error logs are persisted to object storage, and browser Sentry ' },
+      ],
+      architecture: {
+        summary: '',
+        items: [
+          { name: 'api', purpose: 'Express REST API, authentication, and background workers', detail: '3000' },
+          { name: 'web', purpose: 'One Nginx container serving user web at / and admin web at /console/', detail: '8080' },
+          { name: 'landing', purpose: 'Public Angular landing site with English and Indonesian pages', detail: '8082' },
+          { name: 'postgres', purpose: 'Application database', detail: 'Internal only' },
+          { name: 'redis', purpose: 'Session/cache state, rate limiting, and feature-flag updates', detail: 'Internal only' },
+          { name: 'rabbitmq', purpose: 'Background email and notification jobs', detail: 'Internal only' },
+          { name: 'garage', purpose: 'S3-compatible object storage for attachments, generated PDFs, and error records', detail: 'Internal only' },
+          { name: 'prometheus', purpose: 'Scrapes API metrics', detail: 'Internal only' },
+          { name: 'grafana', purpose: 'Metrics dashboards', detail: '3001' },
+        ],
+        architectureDiagram: 'apps/api/          Express API, domain and internal layers, Prisma schema and migrations\napps/admin-web/    Angular administration app\napps/user-web/     Angular user app\napps/landing-web/  Public Angular SSR landing site\npackages/shared/   Shared TypeScript code\npackages/ui/       Shared UI package source\ninfra/             Garage, Prometheus, Grafana, and web-server configuration\ntests/             Infrastructure checks and Playwright browser flows',
+      },
       techStack: [], featured: true, order: 10, source: 'github',
       githubRepo: 'dxxta/slipakar', repoUrl: 'https://github.com/dxxta/slipakar',
+      lockedFields: ['title'],
+    },
+    {
+      title: 'Notakar',
+      slug: 'notakar',
+      summary: 'Personalized e-receipt in a few steps, send it to your customer, and keep every sale easy to find',
+      description: richText([paragraph('Personalized e-receipt in a few steps, send it to your customer, and keep every sale easy to find')]) as Project['description'],
+      techStack: technologyIDs([]), featured: false, order: 0, source: 'github',
+      githubRepo: 'dxxta/notakar', repoUrl: 'https://github.com/dxxta/notakar', lockedFields: [],
     },
     {
       title: 'Byecheating: Real-time Exam Integrity Platform For Cheating Detection',
@@ -307,7 +427,7 @@ export async function seedContent(payload: Payload): Promise<void> {
       slug: 'colorsorter',
       summary: 'An integrated system that delivers real-time alerts for IoT gadgets and functions as a color sorter.',
       description: projectDescription('An integrated system that delivers real-time alerts for IoT gadgets and functions as a color sorter.', 2024),
-      techStack: technologyIDs(['Arduino']), featured: false, order: 50, source: 'github',
+      techStack: technologyIDs(['Arduino', 'FastAPI']), featured: false, order: 50, source: 'github',
       githubRepo: 'dxxta/Color-Sorter-IoT-Telegram', repoUrl: 'https://github.com/dxxta/Color-Sorter-IoT-Telegram',
       lockedFields: ['title', 'summary', 'description'],
     },
@@ -337,4 +457,16 @@ export async function seedContent(payload: Payload): Promise<void> {
     },
   ]
   for (const project of projects) await upsertProject(payload, project)
+
+  const showcases: ShowcaseSeed[] = [
+    { title: 'Byecheating: Real-time Exam Integrity Platform For Cheating Detection', order: 1, caption: 'Project 1 of 8', imageFile: 'showcase-01.png', featured: true, projectSlug: 'byecheating' },
+    { title: 'Backend: Payment API For Xendit Integration', order: 2, caption: 'Project 2 of 8', imageFile: 'showcase-02.png', featured: false, projectSlug: null },
+    { title: 'Fullstack: Rent Management System For Product Related', order: 3, caption: 'Project 3 of 8', imageFile: 'showcase-03.png', featured: false, projectSlug: null },
+    { title: 'ColorSorter: Integrated Real-time IoT System with Telegram Bot', order: 4, caption: 'Project 4 of 8', imageFile: 'showcase-04.png', featured: false, projectSlug: 'colorsorter' },
+    { title: 'FundConn: Web3 Crowdfunding Platform Based on Ethereum', order: 5, caption: 'Project 5 of 8', imageFile: 'showcase-05.png', featured: true, projectSlug: 'fundconn' },
+    { title: 'Edusign: American Sign Language Mobile App', order: 6, caption: 'Project 6 of 8', imageFile: 'showcase-06.png', featured: false, projectSlug: 'edusign' },
+    { title: 'SEO Friendly Landing Page for Company', order: 7, caption: 'Project 7 of 8', imageFile: 'showcase-07.png', featured: false, projectSlug: null },
+    { title: 'Slipakar: Self-hostable platform for personalized bulk email payslip', order: 8, caption: 'Project 8 of 8', imageFile: 'showcase-08-slipakar.png', featured: true, projectSlug: 'slipakar' },
+  ]
+  for (const showcase of showcases) await upsertShowcase(payload, showcase)
 }

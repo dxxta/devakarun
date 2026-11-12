@@ -20,7 +20,7 @@ describe('Media collection', () => {
     expect(altField).toMatchObject({ name: 'alt', type: 'text', required: true })
     expect(upload).toMatchObject({
       staticDir: 'media',
-      mimeTypes: ['image/*'],
+      mimeTypes: ['image/*', 'application/pdf'],
       imageSizes: [{ name: 'thumbnail', width: 400 }, { name: 'card', width: 800 }],
     })
   })

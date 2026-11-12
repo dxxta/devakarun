@@ -206,13 +206,25 @@ describe('project slug generation', () => {
 
 describe('seeded portfolio data', () => {
   it("contains the owner's resume profile and real project", async () => {
-    const [profile, edusign] = await Promise.all([
+    const [profile, edusign, notakar, technologies, certificates, projects, showcases] = await Promise.all([
       payload.findGlobal({ slug: 'profile', overrideAccess: true }),
       payload.find({ collection: 'projects', where: { slug: { equals: 'edusign' } }, limit: 1, overrideAccess: true }),
+      payload.find({ collection: 'projects', where: { slug: { equals: 'notakar' } }, limit: 1, overrideAccess: true }),
+      payload.find({ collection: 'tech-stack', limit: 1000, overrideAccess: true }),
+      payload.find({ collection: 'certificates', limit: 1000, overrideAccess: true }),
+      payload.find({ collection: 'projects', limit: 1000, overrideAccess: true }),
+      payload.find({ collection: 'portfolio-showcases', limit: 1000, overrideAccess: true }),
     ])
 
     expect(profile.name).toBe('Dinta Syaifuddin')
     expect(edusign.docs).toHaveLength(1)
     expect(edusign.docs[0]?.title).toBe('Edusign: American Sign Language App')
+    expect(notakar.docs).toHaveLength(1)
+    expect(notakar.docs[0]?.featured).toBe(false)
+    expect(technologies.docs).toHaveLength(28)
+    expect(certificates.docs).toHaveLength(16)
+    expect(projects.docs).toHaveLength(9)
+    expect(projects.docs.filter(({ featured }) => featured)).toHaveLength(4)
+    expect(showcases.docs).toHaveLength(8)
   })
 })

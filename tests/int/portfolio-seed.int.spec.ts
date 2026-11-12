@@ -62,16 +62,26 @@ describe('real portfolio seed', () => {
     await seedContent(payload)
     await seedContent(payload)
 
-    const [technologies, certificates, projects, profile] = await Promise.all([
+    const [technologies, certificates, projects, showcases, profile] = await Promise.all([
       payload.find({ collection: 'tech-stack', limit: 1000, overrideAccess: true }),
       payload.find({ collection: 'certificates', limit: 1000, overrideAccess: true }),
       payload.find({ collection: 'projects', limit: 1000, overrideAccess: true }),
+      payload.find({ collection: 'portfolio-showcases', limit: 1000, overrideAccess: true }),
       payload.findGlobal({ slug: 'profile', overrideAccess: true }),
     ])
-    expect(technologies.docs).toHaveLength(26)
-    expect(certificates.docs).toHaveLength(15)
-    expect(projects.docs).toHaveLength(7)
+    expect(technologies.docs).toHaveLength(28)
+    expect(certificates.docs).toHaveLength(16)
+    expect(projects.docs).toHaveLength(9)
+    expect(projects.docs.find(({ slug }) => slug === 'notakar')?.featured).toBe(false)
+    expect(projects.docs.filter(({ featured }) => featured)).toHaveLength(4)
+    expect(showcases.docs).toHaveLength(8)
+    expect(showcases.docs.filter(({ featured }) => featured).map(({ title }) => title)).toEqual(expect.arrayContaining([
+      'Slipakar: Self-hostable platform for personalized bulk email payslip',
+      'Byecheating: Real-time Exam Integrity Platform For Cheating Detection',
+      'FundConn: Web3 Crowdfunding Platform Based on Ethereum',
+    ]))
     expect(profile.name).toBe('Dinta Syaifuddin')
+    expect(profile.listPreviews?.map(({ keyword }) => keyword)).toEqual(['LKS', 'Bangkit Academy', 'CV Tech Solution'])
     expect(technologies.docs.map(({ name }) => name)).not.toEqual(expect.arrayContaining(['TypeScript', 'Next.js', 'Docker']))
     expect(certificates.docs.map(({ title }) => title)).not.toEqual(expect.arrayContaining([
       'Sample Certificate in Web Development', 'Sample Certificate in Cloud Fundamentals',
