@@ -1,27 +1,18 @@
-import type { SVGProps } from 'react'
+import type { HTMLAttributes } from 'react'
 
-export function Wordmark(props: SVGProps<SVGSVGElement>) {
+import { cn } from '@/lib/utils'
+
+export function Wordmark({ className, ...props }: HTMLAttributes<HTMLSpanElement>) {
   return (
-    <svg
+    <span
       aria-hidden="true"
-      fill="currentColor"
-      height="88"
-      viewBox="0 0 460 88"
-      width="460"
+      className={cn(
+        'inline-block w-fit whitespace-nowrap font-display text-2xl font-extrabold leading-none tracking-tighter',
+        className,
+      )}
       {...props}
     >
-      <text
-        x="4"
-        y="68"
-        fontFamily="var(--font-display)"
-        fontSize="72"
-        fontWeight="800"
-        letterSpacing="-3"
-      >
-        <tspan>dev</tspan>
-        <tspan fill="var(--primary)">.</tspan>
-        <tspan>akarun</tspan>
-      </text>
-    </svg>
+      dev<span className="text-primary">.</span>akarun
+    </span>
   )
 }

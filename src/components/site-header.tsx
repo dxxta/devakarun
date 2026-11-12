@@ -86,7 +86,7 @@ export function SiteHeader() {
         className="shrink-0"
         href="/"
       >
-        <Wordmark className="h-8 w-auto" />
+        <Wordmark />
       </Link>
 
       <nav aria-label="Main navigation" className="hidden items-center gap-6 md:flex">
