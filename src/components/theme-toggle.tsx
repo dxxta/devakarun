@@ -2,13 +2,15 @@
 
 import { IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react'
 import { useTheme } from 'next-themes'
+import { useSyncExternalStore } from 'react'
 import { Button } from '@/components/ui/button'
 
 const themes = ['light', 'dark', 'system'] as const
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
-  const currentTheme = theme ?? 'system'
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false)
+  const currentTheme = mounted ? (theme ?? 'system') : 'system'
   const nextTheme = themes[(themes.indexOf(currentTheme as (typeof themes)[number]) + 1) % themes.length] ?? 'light'
   const Icon = currentTheme === 'light' ? IconSun : currentTheme === 'dark' ? IconMoon : IconDeviceDesktop
 
