@@ -204,6 +204,27 @@ async function upsertShowcase(payload: Payload, showcase: ShowcaseSeed): Promise
   await payload.create({ collection: 'portfolio-showcases', data, overrideAccess: true })
 }
 
+const obsoleteShowcaseImages = [
+  'showcase-01.png', 'showcase-02.png', 'showcase-03.png', 'showcase-04.png',
+  'showcase-05.png', 'showcase-06.png', 'showcase-07.png', 'showcase-08-slipakar.png',
+]
+
+// Replaces the previous showcase set: drops showcases that are no longer listed and the old image files.
+async function removeObsoleteShowcases(payload: Payload, currentTitles: string[]): Promise<void> {
+  const existing = await payload.find({ collection: 'portfolio-showcases', limit: 1000, overrideAccess: true })
+  for (const showcase of existing.docs) {
+    if (currentTitles.includes(showcase.title)) continue
+    await payload.delete({ collection: 'portfolio-showcases', id: showcase.id, overrideAccess: true })
+  }
+  for (const filename of obsoleteShowcaseImages) {
+    const media = await payload.find({
+      collection: 'media', where: { filename: { equals: filename } },
+      limit: 1, overrideAccess: true,
+    })
+    if (media.docs[0]) await payload.delete({ collection: 'media', id: media.docs[0].id, overrideAccess: true })
+  }
+}
+
 const techSeeds: TechStackSeed[] = [
   { name: 'Vue', category: 'frontend', order: 10 },
   { name: 'Angular', category: 'frontend', order: 20 },
@@ -306,13 +327,13 @@ export async function seedContent(payload: Payload): Promise<void> {
     slug: 'profile',
     data: {
       name: 'Dinta Syaifuddin',
-      headline: 'Self Hosted Software Engineer',
+      headline: 'Fullstack Software Engineer',
       bio: richText([
         paragraph("I'm a Software Engineer with experience in Frontend, Backend, Mobile and ML/IoT integration. Informatics Engineering graduate (B.Inf) from University of Mataram, based in Lombok, Indonesia."),
         heading('Experience'),
         bulletList([
-          'Batii, Fullstack Contract Based (2 Feb 2026 - Present): migrated existing modules into a new integrated micro frontend app using Angular, and used C# to build an API-based app with a PostgreSQL database.',
-          'Batii, Fullstack Contract Based (Jan - Dec 2025): migrated existing modules into a new integrated micro frontend app using Angular.',
+          'Batii, Fullstack Contract Based (Feb 2026 - Present): migrated existing modules into a new integrated micro frontend app using Angular, and used C# to build an API-based app with a PostgreSQL database.',
+          'Batii, Frontend Contract Based (Oct - Dec 2025): migrated existing modules into a new integrated micro frontend app using Angular.',
           'PT Hayookerja Abhinaya Indonesia, Web-Dev (Jan 2022 - Dec 2025): managed the company landing page and Human Resource Information System (HRIS) application. Started as frontend developer and was promoted to backend developer in early 2025.',
           'Bangkit Academy led by Google, Tokopedia, Gojek and Traveloka (Feb - June 2024): Android developer at Edusign team (Bangkit cohort) using Jetpack Compose with integrated machine learning and RESTful API; the app helps people understand American Sign Language.',
           'Kedaireka Halal Tourism, Fullstack Web-Dev (Aug - Dec 2023): web application with integrated RESTful API and payment gateway for Lombok Halal Room, a platform used for halal tourism.',
@@ -409,7 +430,7 @@ export async function seedContent(payload: Payload): Promise<void> {
       summary: 'Integrated REST API with a cheating detection model (YOLOv5) through RTSP protocol.',
       description: projectDescription('Integrated REST API with a cheating detection model (YOLOv5) through RTSP protocol.', 2024),
       techStack: technologyIDs([]), featured: true, order: 20, source: 'github',
-      githubRepo: 'dxxta/Cheating-Detection-API', repoUrl: 'https://github.com/dxxta/Cheating-Detection-API',
+      githubRepo: 'dxxta/cheating-detection-api', repoUrl: 'https://github.com/dxxta/cheating-detection-api',
       lockedFields: ['title', 'summary', 'description'],
     },
     {
@@ -466,14 +487,16 @@ export async function seedContent(payload: Payload): Promise<void> {
   for (const project of projects) await upsertProject(payload, project)
 
   const showcases: ShowcaseSeed[] = [
-    { title: 'Byecheating: Real-time Exam Integrity Platform For Cheating Detection', order: 1, caption: 'Project 1 of 8', imageFile: 'showcase-01.png', featured: true, projectSlug: 'byecheating' },
-    { title: 'Backend: Payment API For Xendit Integration', order: 2, caption: 'Project 2 of 8', imageFile: 'showcase-02.png', featured: false, projectSlug: null },
-    { title: 'Fullstack: Rent Management System For Product Related', order: 3, caption: 'Project 3 of 8', imageFile: 'showcase-03.png', featured: false, projectSlug: null },
-    { title: 'ColorSorter: Integrated Real-time IoT System with Telegram Bot', order: 4, caption: 'Project 4 of 8', imageFile: 'showcase-04.png', featured: false, projectSlug: 'colorsorter' },
-    { title: 'FundConn: Web3 Crowdfunding Platform Based on Ethereum', order: 5, caption: 'Project 5 of 8', imageFile: 'showcase-05.png', featured: true, projectSlug: 'fundconn' },
-    { title: 'Edusign: American Sign Language Mobile App', order: 6, caption: 'Project 6 of 8', imageFile: 'showcase-06.png', featured: false, projectSlug: 'edusign' },
-    { title: 'SEO Friendly Landing Page for Company', order: 7, caption: 'Project 7 of 8', imageFile: 'showcase-07.png', featured: false, projectSlug: null },
-    { title: 'Slipakar: Self-hostable platform for personalized bulk email payslip', order: 8, caption: 'Project 8 of 8', imageFile: 'showcase-08-slipakar.png', featured: true, projectSlug: 'slipakar' },
+    { title: 'Byecheating: Real-time Exam Integrity Platform For Cheating Detection', order: 1, caption: 'Project 1 of 9', imageFile: 'showcase-01-byecheating.png', featured: true, projectSlug: 'byecheating' },
+    { title: 'Backend: Payment API For Xendit Integration', order: 2, caption: 'Project 2 of 9', imageFile: 'showcase-02-xendit-payment-api.png', featured: false, projectSlug: null },
+    { title: 'Fullstack: Rent Management System For Product Related', order: 3, caption: 'Project 3 of 9', imageFile: 'showcase-03-rent-management.png', featured: false, projectSlug: null },
+    { title: 'ColorSorter: Integrated Real-time IoT System with Telegram Bot', order: 4, caption: 'Project 4 of 9', imageFile: 'showcase-04-colorsorter.png', featured: false, projectSlug: 'colorsorter' },
+    { title: 'FundConn: Web3 Crowdfunding Platform Based on Ethereum', order: 5, caption: 'Project 5 of 9', imageFile: 'showcase-05-fundconn.png', featured: true, projectSlug: 'fundconn' },
+    { title: 'Edusign: American Sign Language Mobile App', order: 6, caption: 'Project 6 of 9', imageFile: 'showcase-06-edusign.png', featured: false, projectSlug: 'edusign' },
+    { title: 'SEO Friendly Landing Page for Company', order: 7, caption: 'Project 7 of 9', imageFile: 'showcase-07-company-landing.png', featured: false, projectSlug: null },
+    { title: 'Slipakar: Personalized payslip in bulk email platform', order: 8, caption: 'Project 8 of 9', imageFile: 'showcase-08-slipakar.png', featured: true, projectSlug: 'slipakar' },
+    { title: 'Notakar: Personalized e-receipts in more easier way', order: 9, caption: 'Project 9 of 9', imageFile: 'showcase-09-notakar.png', featured: false, projectSlug: 'notakar' },
   ]
+  await removeObsoleteShowcases(payload, showcases.map(({ title }) => title))
   for (const showcase of showcases) await upsertShowcase(payload, showcase)
 }
