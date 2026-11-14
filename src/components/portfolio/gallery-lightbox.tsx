@@ -99,7 +99,7 @@ export function GalleryLightbox({
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/80 motion-reduce:animate-none" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className="fixed inset-3 z-50 m-auto flex max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-6xl flex-col items-center justify-center gap-4 rounded-card border-2 border-border bg-card p-4 shadow-hard focus:outline-none sm:inset-6 sm:max-h-[calc(100dvh-3rem)] sm:w-[calc(100%-3rem)] sm:p-6"
+          className="fixed inset-3 z-50 m-auto flex max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-6xl flex-col items-center justify-center gap-4 rounded-card border-2 border-ink-fixed bg-card p-4 shadow-hard focus:outline-none sm:inset-6 sm:max-h-[calc(100dvh-3rem)] sm:w-[calc(100%-3rem)] sm:p-6"
           onKeyDown={(event) => {
             if (event.key === 'ArrowLeft') {
               event.preventDefault()
@@ -112,14 +112,14 @@ export function GalleryLightbox({
         >
           <DialogPrimitive.Title className="sr-only">{activeImage?.title ?? 'Project screenshot'}</DialogPrimitive.Title>
           <DialogPrimitive.Close asChild>
-            <Button aria-label="Close gallery image" className="absolute top-3 right-3 z-10 size-10 rounded-full p-0" size="icon" variant="quiet">
+            <Button aria-label="Close gallery image" className="absolute top-3 right-3 z-10 size-10 p-0" size="icon" variant="quiet">
               <IconX aria-hidden="true" className="size-5" />
             </Button>
           </DialogPrimitive.Close>
           {activeImage ? (
             <>
               <div className="flex min-h-0 w-full flex-1 items-center justify-center gap-2">
-                <Button aria-label="Previous image" className="size-10 rounded-full p-0" onClick={() => moveImage(-1)} size="icon" variant="quiet">
+                <Button aria-label="Previous image" className="size-10 p-0" onClick={() => moveImage(-1)} size="icon" variant="quiet">
                   <IconChevronLeft aria-hidden="true" />
                 </Button>
                 <Image
@@ -132,7 +132,7 @@ export function GalleryLightbox({
                   unoptimized
                   width={activeImage.width}
                 />
-                <Button aria-label="Next image" className="size-10 rounded-full p-0" onClick={() => moveImage(1)} size="icon" variant="quiet">
+                <Button aria-label="Next image" className="size-10 p-0" onClick={() => moveImage(1)} size="icon" variant="quiet">
                   <IconChevronRight aria-hidden="true" />
                 </Button>
               </div>

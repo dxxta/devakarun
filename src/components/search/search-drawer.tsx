@@ -109,13 +109,13 @@ export function SearchDrawer() {
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button aria-label="Open search" className="size-11 rounded-full" size="icon" type="button" variant="outline">
+        <Button aria-label="Open search" className="size-11" size="icon" type="button" variant="outline">
           <IconSearch aria-hidden="true" className="size-5" />
         </Button>
       </SheetTrigger>
       <SheetContent
         aria-describedby={undefined}
-        className="!h-[80dvh] !max-h-[80dvh] !w-full !max-w-none !overflow-hidden !rounded-t-card !border-2 !border-t-2 !border-b-0 !border-border !bg-card !p-0"
+        className="!h-[80dvh] !max-h-[80dvh] !w-full !max-w-none !overflow-hidden !rounded-t-card !border-2 !border-t-2 !border-b-0 !border-ink-fixed !bg-card !p-0"
         side="bottom"
         showCloseButton={false}
       >
@@ -169,7 +169,7 @@ export function SearchDrawer() {
                       {group.items.map((result) => (
                         <li key={`${result.type}:${result.href}`}>
                           <SheetClose asChild>
-                            <Link className="flex min-h-16 items-start gap-3 rounded-card border-2 border-border bg-card p-3 text-foreground shadow-hard transition hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink" data-pressable="card" href={result.href}>
+                            <Link className="flex min-h-16 items-start gap-3 rounded-card border-2 border-ink-fixed bg-card p-3 text-foreground shadow-hard transition hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink" data-pressable="card" href={result.href}>
                               <Badge className="mt-0.5" variant="secondary">{result.type}</Badge>
                               <span className="min-w-0">
                                 <span className="block font-display font-bold">{result.title}</span>

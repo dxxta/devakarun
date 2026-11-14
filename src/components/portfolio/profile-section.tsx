@@ -51,7 +51,7 @@ export async function ProfileSection() {
 
       {sections.length ? (
         <Accordion
-          className="w-full rounded-card border-2 border-border bg-card px-5 sm:px-7"
+          className="w-full rounded-card border-2 border-ink-fixed bg-card px-5 sm:px-7"
           type="multiple"
         >
           {sections.map((section) => (

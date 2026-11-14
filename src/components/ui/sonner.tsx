@@ -28,7 +28,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       toastOptions={{
         classNames: {
-          toast: 'rounded-control border-2 border-border bg-popover text-popover-foreground shadow-hard',
+          toast: 'rounded-control border-2 border-ink-fixed bg-popover text-popover-foreground shadow-hard',
           title: 'font-display font-semibold',
           description: 'text-muted-foreground',
           error: '!border-error/30 !bg-error/10 !text-error',

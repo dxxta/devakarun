@@ -59,7 +59,7 @@ export function ProfileActions({
           <DialogPrimitive.Portal>
             <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-ink/60" />
             <DialogPrimitive.Content
-              className="fixed top-1/2 left-1/2 z-[120] grid w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-4 rounded-card border-2 border-border bg-card p-6 text-card-foreground shadow-hard focus:outline-none"
+              className="fixed top-1/2 left-1/2 z-[120] grid w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-4 rounded-card border-2 border-ink-fixed bg-card p-6 text-card-foreground shadow-hard focus:outline-none"
               onCloseAutoFocus={(event) => {
                 event.preventDefault()
                 aboutLinkRef.current?.focus()

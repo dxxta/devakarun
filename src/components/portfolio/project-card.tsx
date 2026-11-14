@@ -23,7 +23,7 @@ export function ProjectCard({ project }: { project: Project }) {
         data-pressable="card"
         href={`/projects/${project.slug}`}
       >
-      <Card className="pointer-events-none h-full w-full gap-4 rounded-[calc(1.5rem-3px)] border-0">
+      <Card className="pointer-events-none h-full w-full gap-4 rounded-[calc(1.5rem-3px)] border-0 shadow-none">
         <div className="relative">
           <MediaImage
             alt={project.title}
@@ -56,7 +56,7 @@ export function ProjectCard({ project }: { project: Project }) {
         <Button
           asChild
           aria-label="View repository on GitHub"
-          className="absolute right-5 bottom-5 z-10 size-8 rounded-full p-0"
+          className="absolute right-5 bottom-5 z-10 size-8 p-0"
           size="icon"
           variant="quiet"
         >

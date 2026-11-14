@@ -54,7 +54,7 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          'fixed z-50 flex flex-col gap-4 overflow-y-auto border-2 border-border bg-card p-5 text-card-foreground shadow-hard transition-transform ease-out data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:animate-in data-[state=open]:duration-200 motion-reduce:animate-none motion-reduce:transition-none',
+          'fixed z-50 flex flex-col gap-4 overflow-y-auto border-2 border-ink-fixed bg-card p-5 text-card-foreground shadow-hard transition-transform ease-out data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:animate-in data-[state=open]:duration-200 motion-reduce:animate-none motion-reduce:transition-none',
           side === 'right' &&
             'inset-y-0 right-0 h-dvh w-full rounded-none data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-md sm:rounded-l-card',
           side === 'left' &&

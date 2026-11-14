@@ -27,7 +27,7 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        default: 'rounded-pill border-2 border-ink bg-card p-1',
+        default: 'rounded-pill border-2 border-ink-fixed bg-card p-1',
         line: 'rounded-none border-0 border-b-2 border-border bg-transparent px-0 pb-1',
       },
     },

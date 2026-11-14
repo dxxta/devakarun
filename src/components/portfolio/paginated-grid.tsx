@@ -56,7 +56,7 @@ export function PaginatedGrid({ children, pageSize, label, columns = 2 }: Pagina
         <nav aria-label={label} className="mt-6 hidden flex-wrap items-center justify-center gap-2 sm:flex">
           <Button
             aria-label="Previous page"
-            className="!size-10 !min-w-10 !shrink-0 !rounded-full !border-2 !p-0"
+            className="!size-10 !min-w-10 !shrink-0 !border-2 !p-0"
             disabled={currentPage === 1}
             onClick={() => showPage(currentPage - 1)}
             size="icon"
@@ -73,7 +73,7 @@ export function PaginatedGrid({ children, pageSize, label, columns = 2 }: Pagina
               <Button
                 aria-current={isCurrentPage ? 'page' : undefined}
                 aria-label={`Go to page ${page}`}
-                className={`!size-10 !min-w-10 !shrink-0 !rounded-full !border-2 !p-0 font-display text-sm tabular-nums ${isCurrentPage ? '!border-ink' : ''}`}
+                className={`!size-10 !min-w-10 !shrink-0 !border-2 !p-0 font-display text-sm tabular-nums ${isCurrentPage ? '!border-ink-fixed' : ''}`}
                 key={page}
                 onClick={() => showPage(page)}
                 size="icon"
@@ -86,7 +86,7 @@ export function PaginatedGrid({ children, pageSize, label, columns = 2 }: Pagina
           })}
           <Button
             aria-label="Next page"
-            className="!size-10 !min-w-10 !shrink-0 !rounded-full !border-2 !p-0"
+            className="!size-10 !min-w-10 !shrink-0 !border-2 !p-0"
             disabled={currentPage === pageCount}
             onClick={() => showPage(currentPage + 1)}
             size="icon"

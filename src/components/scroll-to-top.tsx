@@ -46,7 +46,7 @@ export function ScrollToTop() {
     >
       <Button
         aria-label="Scroll to top"
-        className={`size-11 rounded-full ${visible ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        className={`size-11 ${visible ? 'pointer-events-auto' : 'pointer-events-none'}`}
         onClick={scrollToTop}
         size="icon"
         tabIndex={visible ? 0 : -1}

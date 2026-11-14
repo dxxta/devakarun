@@ -27,17 +27,21 @@
   --ring: #d4f03c;
   --error: #e5484d;
   --ink: #151513;
-  --ink-fixed: #151513;
+  --ink-fixed: #000000;
   --on-ink: #f7efe7;
-  --border-strong: light-dark(var(--ink), color-mix(in oklab, #f7efe7 35%, transparent));
-  --shadow-color: light-dark(var(--ink), color-mix(in oklab, #f7efe7 30%, transparent));
+  --border-strong: var(--ink-fixed);
+  --shadow-color: #000000;
 
   --radius-pill: 999px;
   --radius-card: 1rem;
   --radius-control: 0.85rem;
-  --shadow-hard: 4px 4px 0 #000000;
-  --shadow-hover: 4px 6px 0 #000000;
-  --shadow-pressed: 1px 1px 0 #000000;
+  --shadow-hard: 4px 4px 0 var(--shadow-color);
+  --shadow-hover: 4px 6px 0 var(--shadow-color);
+  --shadow-pressed: 1px 1px 0 var(--shadow-color);
+  --border-width-strong: 3px;
+  --border-width-card: 2px;
+  --press-x: 3px;
+  --press-y: 3px;
 }
 
 .dark {
@@ -65,7 +69,7 @@
   --error: #e5484d;
   --ink: #000000;
   --ink-fixed: #000000;
-  --border-strong: #000000;
+  --border-strong: var(--ink-fixed);
   --shadow-color: #000000;
 }
 
@@ -95,6 +99,7 @@
   --color-ring: var(--ring);
   --color-error: var(--error);
   --color-ink: var(--ink);
+  --color-ink-fixed: var(--ink-fixed);
 
   --radius-xs: 0.25rem;
   --radius-sm: 0.5rem;
@@ -108,9 +113,13 @@
   --radius-card: 1rem;
   --radius-control: 0.85rem;
 
-  --shadow-hard: 4px 4px 0 #000000;
-  --shadow-hover: 4px 6px 0 #000000;
-  --shadow-pressed: 1px 1px 0 #000000;
+  --shadow-hard: 4px 4px 0 var(--shadow-color);
+  --shadow-hover: 4px 6px 0 var(--shadow-color);
+  --shadow-pressed: 1px 1px 0 var(--shadow-color);
+  --border-width-strong: 3px;
+  --border-width-card: 2px;
+  --press-x: 3px;
+  --press-y: 3px;
 
   --font-display: 'Bricolage Grotesque', sans-serif;
   --font-sans: 'Plus Jakarta Sans', sans-serif;
@@ -159,64 +168,38 @@
 
 }
 
-[data-pressable]:not(:disabled):not([aria-disabled='true']) {
-  --press-x: 4px;
-  --press-y: 4px;
+/* Pressable surfaces: sit on a hard shadow, lift on hover, sink into it when pressed. */
+[data-pressable] {
+  --press-x: 3px;
+  --press-y: 3px;
   transition: transform 140ms ease-out, box-shadow 140ms ease-out;
 }
 
-[data-pressable][data-pressed]:not(:disabled):not([aria-disabled='true']) {
-  transform: translate(var(--press-x), var(--press-y));
-  box-shadow: 0 0 0 var(--shadow-color) !important;
-}
-
-[data-pressable='button']:not(:disabled):not([aria-disabled='true']) {
-  --press-x: 0px;
-  --press-y: 4px;
-  min-height: 48px;
-  border: 3px solid var(--border-strong);
-  border-radius: 999px;
-  box-shadow: 0 4px 0 var(--shadow-color), inset 0 2px 0 color-mix(in oklab, var(--on-ink) 35%, transparent);
-  font-weight: 800;
-}
-
-[data-pressable='button'][data-size='xs']:not(:disabled),
-[data-pressable='button'][data-size='sm']:not(:disabled) {
-  min-height: 40px;
-}
-
-[data-pressable='button']:hover:not(:disabled):not([aria-disabled='true']) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--shadow-color), inset 0 2px 0 color-mix(in oklab, var(--on-ink) 35%, transparent);
-}
-
-[data-pressable='button'][data-pressed]:not(:disabled):not([aria-disabled='true']) {
-  transform: translate(0, 4px);
-  box-shadow: 0 0 0 var(--shadow-color) !important;
-}
-
+[data-pressable='button']:not(:disabled):not([aria-disabled='true']),
 [data-pressable='icon']:not(:disabled):not([aria-disabled='true']) {
-  --press-x: 4px;
-  --press-y: 4px;
-  min-width: 40px;
-  min-height: 40px;
-  border: 2px solid var(--border-strong);
-  border-radius: 50%;
-  box-shadow: 4px 4px 0 var(--shadow-color);
+  border-color: var(--ink-fixed);
+  box-shadow: var(--shadow-hard);
 }
 
-[data-pressable='icon']:hover:not(:disabled):not([aria-disabled='true']) {
+[data-pressable='icon'] {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-width: 2px;
+  border-radius: var(--radius-control);
+}
+
+[data-pressable='button']:hover:not(:disabled):not([aria-disabled='true']):not([data-pressed]),
+[data-pressable='icon']:hover:not(:disabled):not([aria-disabled='true']):not([data-pressed]) {
   transform: translateY(-2px);
-  box-shadow: 4px 6px 0 var(--shadow-color);
+  box-shadow: var(--shadow-hover);
 }
 
-[data-pressable='icon'][data-pressed]:not(:disabled):not([aria-disabled='true']) {
-  box-shadow: 0 0 0 var(--shadow-color) !important;
+[data-pressable='card'] {
+  --press-x: 5px;
+  --press-y: 5px;
 }
 
 [data-pressable='card']:not(:disabled):not([aria-disabled='true']) {
-  --press-x: 5px;
-  --press-y: 5px;
   border: 3px solid var(--border-strong);
   border-radius: 1.5rem;
   box-shadow: 5px 5px 0 var(--shadow-color);
@@ -235,28 +218,35 @@
   transform: translateY(-3px) rotate(0.5deg);
 }
 
+[data-pressable='button'][data-pressed]:not(:disabled):not([aria-disabled='true']),
+[data-pressable='icon'][data-pressed]:not(:disabled):not([aria-disabled='true']) {
+  transform: translate(var(--press-x), var(--press-y));
+  box-shadow: var(--shadow-pressed);
+}
+
 [data-pressable='card'][data-pressed]:hover:not(:disabled):not([aria-disabled='true']),
-:is(li, [role='listitem']):nth-child(even):has(> [data-pressable='card'][data-pressed]):hover > [data-pressable='card'] {
+:is(li, [role='listitem']):nth-child(even):has(> [data-pressable='card'][data-pressed]):hover > [data-pressable='card'],
+[data-pressable='card'][data-pressed]:not(:disabled):not([aria-disabled='true']) {
   transform: translate(var(--press-x), var(--press-y));
   box-shadow: 0 0 0 var(--shadow-color) !important;
-}
-
-.site-footer [data-pressable='button']:not(:disabled) {
-  border-color: var(--ink-fixed);
-  box-shadow: 0 4px 0 var(--ink-fixed), inset 0 2px 0 color-mix(in oklab, var(--on-ink) 35%, transparent);
-}
-
-.site-footer [data-pressable='button']:hover:not(:disabled) {
-  box-shadow: 0 6px 0 var(--ink-fixed), inset 0 2px 0 color-mix(in oklab, var(--on-ink) 35%, transparent);
-}
-
-.site-footer [data-pressable][data-pressed]:not(:disabled) {
-  box-shadow: 0 0 0 var(--ink-fixed) !important;
 }
 
 [data-pressable]:focus-visible {
   outline: 2px solid var(--ink-fixed);
   outline-offset: 4px;
+}
+
+/* Unstyled mode: same colours and fonts, flat and still. */
+html[data-style='unstyled'] {
+  --shadow-hard: none;
+  --shadow-hover: none;
+  --shadow-pressed: none;
+  --press-x: 0px;
+  --press-y: 0px;
+  --radius-card: 0.375rem;
+  --radius-control: 0.25rem;
+  --border-width-strong: 1px;
+  --border-width-card: 1px;
 }
 
 @media (prefers-reduced-motion: reduce) {

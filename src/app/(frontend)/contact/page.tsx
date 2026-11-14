@@ -47,7 +47,7 @@ export default async function ContactPage() {
 
   return (
     <div className="grid gap-8">
-      <section className="grid grid-cols-1 items-stretch gap-2 overflow-hidden rounded-card border-2 border-border bg-card p-2 sm:p-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <section className="grid grid-cols-1 items-stretch gap-2 overflow-hidden rounded-card border-2 border-ink-fixed bg-card p-2 sm:p-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <aside className="rounded-card bg-primary p-8 text-primary-foreground lg:p-10">
           <div className="grid content-start gap-8">
             <div>
@@ -65,7 +65,7 @@ export default async function ContactPage() {
                       data-pressable="card"
                       href={url}
                     >
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ink text-primary-foreground">
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ink-fixed text-primary-foreground">
                         <ContactIcon label={label} url={url} />
                       </span>
                       <span className="grid min-w-0 gap-1">

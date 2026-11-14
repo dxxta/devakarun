@@ -15,7 +15,7 @@ export default async function NewsletterUnsubscribePage({
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-16">
-      <section className="rounded-card border-2 border-border bg-card p-8 shadow-hard">
+      <section className="rounded-card border-2 border-ink-fixed bg-card p-8 shadow-hard">
         <h1 className="text-3xl font-extrabold tracking-tight">{result.success ? 'Unsubscribed' : 'Unsubscribe link unavailable'}</h1>
         <p className="mt-4 text-muted-foreground">{result.message}</p>
       </section>

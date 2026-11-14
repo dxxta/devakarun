@@ -15,7 +15,7 @@ export function PostCard({ post }: { post: Post }) {
   const date = formatDate(post.publishedAt)
 
   return (
-    <Card className="overflow-hidden border-2 border-border bg-card" data-pressable="card">
+    <Card className="overflow-hidden border-2 border-ink-fixed bg-card" data-pressable="card">
       {cover?.url ? (
         <Link aria-label={`Read ${post.title}`} className="relative block aspect-[16/9] overflow-hidden focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink" href={`/blog/${post.slug}`}>
           <Image alt={cover.alt || ''} className="object-cover" fill sizes="(max-width: 768px) 100vw, 50vw" src={cover.url} />

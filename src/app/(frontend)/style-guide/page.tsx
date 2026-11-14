@@ -42,7 +42,7 @@ export default function StyleGuidePage() {
 
       <section aria-labelledby="card-title" className="space-y-5">
         <h2 className="m-0 font-display text-2xl font-bold" id="card-title">Card</h2>
-        <Card className="border-2 border-border bg-card shadow-hard">
+        <Card className="border-2 border-ink-fixed bg-card shadow-hard">
           <CardHeader><CardTitle className="font-display text-xl">A simple card</CardTitle></CardHeader>
           <CardContent><p className="m-0 text-pretty text-muted-foreground">A surface for a focused piece of information.</p></CardContent>
         </Card>

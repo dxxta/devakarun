@@ -78,8 +78,8 @@ export function ProjectDetail({ project }: { project: Project }) {
           <h2 className="m-0 font-display text-2xl font-bold" id="project-features-heading">Features</h2>
           <ul className="m-0 grid list-none gap-4 p-0 md:grid-cols-2">
             {features.map((feature, index) => (
-              <li className="flex items-start gap-4 rounded-card border-2 border-border bg-card p-5" key={feature.id ?? `${feature.title}-${index}`}>
-                <span aria-hidden="true" className="mt-[0.3em] size-[18px] flex-none rounded-full border-2 border-ink bg-primary shadow-[1px_1px_0_#000]" />
+              <li className="flex items-start gap-4 rounded-card border-2 border-ink-fixed bg-card p-5" key={feature.id ?? `${feature.title}-${index}`}>
+                <span aria-hidden="true" className="mt-[0.3em] size-[18px] flex-none rounded-full border-2 border-ink-fixed bg-primary shadow-[1px_1px_0_#000]" />
                 <div className="min-w-0">
                   {feature.title?.trim() ? <h3 className="m-0 font-display font-bold">{feature.title}</h3> : null}
                   {feature.text?.trim() ? <p className="mb-0 mt-1 leading-relaxed text-muted-foreground">{feature.text}</p> : null}

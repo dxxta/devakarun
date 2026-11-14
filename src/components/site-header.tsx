@@ -80,7 +80,7 @@ export function SiteHeader() {
       ref={headerContainerRef}
       style={containerWidths ? { width: `${scrolled ? containerWidths.narrow : containerWidths.wide}px` } : undefined}
     >
-    <header className="flex min-h-16 items-center justify-between gap-3 rounded-full border-2 border-border bg-card px-4 shadow-hard md:px-6">
+    <header className="flex min-h-16 items-center justify-between gap-3 rounded-full border-2 border-ink-fixed bg-card px-4 shadow-hard md:px-6">
       <Link
         aria-label="dev.akarun home"
         className="shrink-0"
@@ -106,7 +106,7 @@ export function SiteHeader() {
           <SheetTrigger asChild>
             <Button
               aria-label="Open navigation menu"
-              className="size-11 rounded-full md:hidden"
+              className="size-11 md:hidden"
               size="icon"
               variant="outline"
             >

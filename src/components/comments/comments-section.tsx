@@ -55,7 +55,7 @@ export async function CommentsSection({ postId }: { postId: number }) {
         <ol className="m-0 grid list-none gap-5 p-0">
           {topLevel.map((comment) => (
             <li className="grid gap-4" key={comment.id}>
-              <article className="rounded-card border-2 border-border bg-card p-5">
+              <article className="rounded-card border-2 border-ink-fixed bg-card p-5">
                 <header className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <h3 className="m-0 font-display text-lg font-bold">{comment.authorName}</h3>
                   <time className="text-sm text-muted-foreground" dateTime={comment.createdAt}>{formatCommentDate(comment.createdAt)}</time>
@@ -66,7 +66,7 @@ export async function CommentsSection({ postId }: { postId: number }) {
                 <ol className="ml-4 grid list-none gap-3 border-l-2 border-border pl-4 sm:ml-8 sm:pl-6">
                   {repliesFor(comment.id).map((reply) => (
                     <li key={reply.id}>
-                      <article className="rounded-card border-2 border-border bg-card p-4">
+                      <article className="rounded-card border-2 border-ink-fixed bg-card p-4">
                         <header className="mb-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                           <h4 className="m-0 font-display font-bold">{reply.authorName}</h4>
                           <time className="text-sm text-muted-foreground" dateTime={reply.createdAt}>{formatCommentDate(reply.createdAt)}</time>
@@ -82,7 +82,7 @@ export async function CommentsSection({ postId }: { postId: number }) {
         </ol>
       ) : null}
 
-      <div className="space-y-4 rounded-card border-2 border-border bg-card p-5">
+      <div className="space-y-4 rounded-card border-2 border-ink-fixed bg-card p-5">
         <div className="flex items-center justify-between gap-4">
           <h3 className="m-0 font-display text-xl font-bold">Join the conversation</h3>
           {session?.user ? null : <GoogleSignInButton />}

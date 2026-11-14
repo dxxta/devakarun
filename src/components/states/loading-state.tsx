@@ -27,7 +27,7 @@ function CardsSkeleton() {
   return (
     <div className="grid w-full gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 3 }, (_, index) => (
-        <div className="flex flex-col gap-4 rounded-card border-2 border-border bg-card p-5 shadow-hard" key={index}>
+        <div className="flex flex-col gap-4 rounded-card border-2 border-ink-fixed bg-card p-5 shadow-hard" key={index}>
           <Skeleton className="aspect-video w-full" />
           <Skeleton className="h-6 w-3/4" />
           <div className="space-y-2">
