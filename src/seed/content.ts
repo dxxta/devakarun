@@ -1,17 +1,22 @@
 import path from 'node:path'
 import type { Payload } from 'payload'
 
-import type { Certificate, Media, PortfolioShowcase, Profile, Project, TechStack } from '../payload-types'
+import type { Certificate, GalleryImage, Media, PortfolioShowcase, Profile, Project, TechStack } from '../payload-types'
 
 type TechStackSeed = Pick<TechStack, 'name' | 'category' | 'order'>
 type ProjectSeed = Pick<
   Project,
-  'title' | 'slug' | 'summary' | 'description' | 'features' | 'architecture' | 'techStack' | 'featured' | 'order' | 'source' | 'githubRepo' | 'repoUrl' | 'lockedFields'
->
+  'title' | 'slug' | 'summary' | 'description' | 'features' | 'architecture' | 'techStack' | 'featured' | 'order' | 'source' | 'githubRepo' | 'repoUrl' | 'liveUrl' | 'lockedFields'
+> & {
+  coverImageFile?: string | null
+  coverImageAlt?: string
+  galleryImageFiles?: Array<{ filename: string; alt: string }>
+}
 type ShowcaseSeed = Pick<PortfolioShowcase, 'title' | 'order' | 'caption' | 'featured'> & {
   imageFile: string
   projectSlug: string | null
 }
+type GalleryImageSeed = Pick<GalleryImage, 'title' | 'caption' | 'order' | 'takenAt'> & { imageFile: string }
 type CertificateSeed = Pick<Certificate, 'title' | 'issuer' | 'issueDate' | 'order' | 'highlighted'> & {
   expiryDate?: string
   credentialUrl?: string
@@ -100,7 +105,7 @@ async function upsertCertificate(payload: Payload, certificate: CertificateSeed)
   await payload.create({ collection: 'certificates', data, overrideAccess: true })
 }
 
-async function upsertSeedMedia(
+export async function upsertSeedMedia(
   payload: Payload,
   filename: string,
   alt: string,
@@ -124,6 +129,19 @@ async function upsertSeedMedia(
 }
 
 async function upsertProject(payload: Payload, data: ProjectSeed): Promise<void> {
+  const { coverImageFile, coverImageAlt, galleryImageFiles, ...projectData } = data
+  let coverImage: number | null | undefined
+  if (coverImageFile !== undefined) {
+    coverImage = coverImageFile
+      ? (await upsertSeedMedia(payload, coverImageFile, coverImageAlt ?? `${data.title} project cover`, path.join('projects', coverImageFile))).id
+      : null
+  }
+  const gallery = galleryImageFiles === undefined
+    ? undefined
+    : (await Promise.all(galleryImageFiles.map((image) => (
+      upsertSeedMedia(payload, image.filename, image.alt, path.join('projects', image.filename))
+    )))).map((image) => image.id)
+  const fullData = { ...projectData, ...(coverImage !== undefined ? { coverImage } : {}), ...(gallery !== undefined ? { gallery } : {}) }
   const existing = await payload.find({
     collection: 'projects', where: { slug: { equals: data.slug } },
     limit: 1, overrideAccess: true,
@@ -138,11 +156,11 @@ async function upsertProject(payload: Payload, data: ProjectSeed): Promise<void>
         featured: data.featured,
         order: data.order,
       }
-      : data
-    await payload.update({ collection: 'projects', id: existing.docs[0].id, data: updateData, overrideAccess: true })
+      : fullData
+    await payload.update({ collection: 'projects', id: existing.docs[0].id, data: updateData as Partial<Project>, overrideAccess: true })
     return
   }
-  await payload.create({ collection: 'projects', data, overrideAccess: true })
+  await payload.create({ collection: 'projects', data: fullData, overrideAccess: true })
 }
 
 async function deleteByField<K extends 'tech-stack' | 'certificates' | 'projects'>(
@@ -204,6 +222,120 @@ async function upsertShowcase(payload: Payload, showcase: ShowcaseSeed): Promise
   await payload.create({ collection: 'portfolio-showcases', data, overrideAccess: true })
 }
 
+const galleryImages: GalleryImageSeed[] = [
+  {
+    title: 'Welcome home, Builders',
+    caption: 'I stood by the DevFest Jakarta 26 entrance before the event.',
+    order: 1,
+    takenAt: '2026-11-01T00:00:00.000Z',
+    imageFile: 'devfest-jakarta-2026-01.jpg',
+  },
+  {
+    title: 'My DevFest Builders badge',
+    caption: 'The green attendee badge shows GDG Jakarta and Women Techmakers.',
+    order: 2,
+    takenAt: '2026-11-01T00:00:00.000Z',
+    imageFile: 'devfest-jakarta-2026-02.jpg',
+  },
+  {
+    title: 'Builders in the Agentic Era panel',
+    caption: 'Panelists take the stage during the Builders in the Agentic Era session.',
+    order: 3,
+    takenAt: '2026-11-01T00:00:00.000Z',
+    imageFile: 'devfest-jakarta-2026-03.jpg',
+  },
+  {
+    title: 'DevFest Jakarta photo strips',
+    caption: 'Photo strips from the event show me and other attendees together.',
+    order: 4,
+    takenAt: '2026-11-01T00:00:00.000Z',
+    imageFile: 'devfest-jakarta-2026-05.jpg',
+  },
+]
+
+export async function seedGalleryImages(payload: Payload): Promise<void> {
+  for (const item of galleryImages) {
+    const media = await upsertSeedMedia(
+      payload,
+      item.imageFile,
+      item.title,
+      path.join('gallery', item.imageFile),
+    )
+    if (media.alt !== item.title) {
+      await payload.update({ collection: 'media', id: media.id, data: { alt: item.title }, overrideAccess: true })
+    }
+    const data = { ...item, image: media.id }
+    const existing = await payload.find({
+      collection: 'gallery-images',
+      where: { title: { equals: item.title } },
+      limit: 1,
+      overrideAccess: true,
+    })
+    if (existing.docs[0]) {
+      await payload.update({ collection: 'gallery-images', id: existing.docs[0].id, data, overrideAccess: true })
+    } else {
+      await payload.create({ collection: 'gallery-images', data, overrideAccess: true })
+    }
+  }
+  await removeObsoleteGalleryImages(payload)
+}
+
+function referencesMedia(value: unknown, mediaID: number): boolean {
+  if (Array.isArray(value)) return value.some((entry) => referencesMedia(entry, mediaID))
+  if (!value || typeof value !== 'object') return false
+  const record = value as Record<string, unknown>
+  if (record.type === 'upload' && record.relationTo === 'media') {
+    const upload = record.value
+    if (typeof upload === 'number' && upload === mediaID) return true
+    if (upload && typeof upload === 'object' && 'id' in upload && upload.id === mediaID) return true
+  }
+  for (const [key, child] of Object.entries(record)) {
+    if (['avatar', 'avatarAlt', 'resumeFile', 'portfolioPdf', 'image', 'logo', 'coverImage', 'gallery'].includes(key)) {
+      if (typeof child === 'number' && child === mediaID) return true
+      if (Array.isArray(child) && child.some((entry) => typeof entry === 'number' ? entry === mediaID : Boolean(entry && typeof entry === 'object' && 'id' in entry && entry.id === mediaID))) return true
+      if (child && typeof child === 'object' && 'id' in child && child.id === mediaID) return true
+    }
+    if (referencesMedia(child, mediaID)) return true
+  }
+  return false
+}
+
+async function mediaIsReferenced(payload: Payload, mediaID: number): Promise<boolean> {
+  const collectionSlugs = ['gallery-images', 'portfolio-showcases', 'certificates', 'projects', 'tech-stack', 'posts'] as const
+  const collectionResults = await Promise.all(collectionSlugs.map((collection) => payload.find({
+    collection,
+    depth: 0,
+    draft: true,
+    limit: 10000,
+    pagination: false,
+    overrideAccess: true,
+  })))
+  if (collectionResults.some((result) => result.docs.some((doc) => referencesMedia(doc, mediaID)))) return true
+
+  const profile = await payload.findGlobal({ slug: 'profile', depth: 1, overrideAccess: true })
+  return referencesMedia(profile, mediaID)
+}
+
+async function removeObsoleteGalleryImages(payload: Payload): Promise<void> {
+  const currentTitles = new Set(galleryImages.map((image) => image.title))
+  const existing = await payload.find({ collection: 'gallery-images', depth: 0, limit: 10000, pagination: false, overrideAccess: true })
+  const obsolete = existing.docs.filter((image) => !currentTitles.has(image.title))
+  const obsoleteMediaIDs = new Set<number>()
+  for (const image of obsolete) {
+    const imageID = typeof image.image === 'number' ? image.image : image.image?.id
+    if (typeof imageID === 'number') obsoleteMediaIDs.add(imageID)
+    await payload.delete({ collection: 'gallery-images', id: image.id, overrideAccess: true })
+  }
+
+  for (const mediaID of obsoleteMediaIDs) {
+    const media = await payload.findByID({ collection: 'media', id: mediaID, overrideAccess: true, showHiddenFields: true })
+    if (media.filename !== 'devfest-jakarta-2026-04.jpg') continue
+    if (!(await mediaIsReferenced(payload, mediaID))) {
+      await payload.delete({ collection: 'media', id: mediaID, overrideAccess: true })
+    }
+  }
+}
+
 const obsoleteShowcaseImages = [
   'showcase-01.png', 'showcase-02.png', 'showcase-03.png', 'showcase-04.png',
   'showcase-05.png', 'showcase-06.png', 'showcase-07.png', 'showcase-08-slipakar.png',
@@ -221,7 +353,15 @@ async function removeObsoleteShowcases(payload: Payload, currentTitles: string[]
       collection: 'media', where: { filename: { equals: filename } },
       limit: 1, overrideAccess: true,
     })
-    if (media.docs[0]) await payload.delete({ collection: 'media', id: media.docs[0].id, overrideAccess: true })
+    if (media.docs[0]) {
+      const showcaseUse = await payload.find({
+        collection: 'portfolio-showcases',
+        where: { image: { equals: media.docs[0].id } },
+        limit: 1,
+        overrideAccess: true,
+      })
+      if (!showcaseUse.docs.length) await payload.delete({ collection: 'media', id: media.docs[0].id, overrideAccess: true })
+    }
   }
 }
 
@@ -258,7 +398,7 @@ const techSeeds: TechStackSeed[] = [
 
 // Verify Dicoding certificate identifiers in a browser; some URLs may use O or 0.
 const certificates: CertificateSeed[] = [
-  { title: '2nd Place, LKS SMK Provincial NTB 2021 - IT Software Solutions for Business', issuer: 'Dinas Pendidikan dan Kebudayaan Provinsi NTB', issueDate: '2021-09-02T00:00:00.000Z', imageFile: 'lks-ntb-2021.png', order: 0, highlighted: false },
+  { title: '2nd Place, LKS SMK Provincial NTB 2021, IT Software Solutions for Business', issuer: 'Dinas Pendidikan dan Kebudayaan Provinsi NTB', issueDate: '2021-09-02T00:00:00.000Z', imageFile: 'lks-ntb-2021.png', order: 0, highlighted: false },
   { title: 'Kotlin Android Intermediate', issuer: 'Dicoding Indonesia', issueDate: '2024-06-18T00:00:00.000Z', expiryDate: '2027-06-18T00:00:00.000Z', credentialUrl: 'https://www.dicoding.com/certificates/MRZME6N9LPYQ', imageFile: 'dicoding-android-intermediate.jpeg', order: 10, highlighted: false },
   { title: 'Machine Learning Implementation For Kotlin Android', issuer: 'Dicoding Indonesia', issueDate: '2024-05-02T00:00:00.000Z', expiryDate: '2027-05-02T00:00:00.000Z', credentialUrl: 'https://www.dicoding.com/certificates/NVP7Q9GQOZR0', imageFile: 'dicoding-ml-android.jpeg', order: 20, highlighted: false },
   { title: 'AI Fundamentals', issuer: 'Dicoding Indonesia', issueDate: '2024-04-19T00:00:00.000Z', expiryDate: '2027-04-19T00:00:00.000Z', credentialUrl: 'https://www.dicoding.com/certificates/07Z605VKJZQR', imageFile: 'dicoding-ai-basics.jpeg', order: 30, highlighted: false },
@@ -295,6 +435,8 @@ export async function seedContent(payload: Payload): Promise<void> {
   await payload.updateGlobal({
     slug: 'site-settings',
     data: {
+      announcement: { enabled: true, text: null, linkLabel: null, linkUrl: null },
+      features: { showProfileDownload: false, showGallery: true },
       siteTitle: 'dev.akarun',
       description: 'Portfolio and blog of Dinta Syaifuddin, self hosted software engineer.',
       socialLinks: [
@@ -317,6 +459,12 @@ export async function seedContent(payload: Payload): Promise<void> {
     'Dinta Syaifuddin avatar',
     path.join('portfolio', 'avatar.jpeg'),
   )
+  const avatarAlt = await upsertSeedMedia(
+    payload,
+    'avatar-hover.jpg',
+    'Dinta on a swing with mountains behind him',
+    path.join('portfolio', 'avatar-hover.jpg'),
+  )
   const previewAssets = {
     lks: await upsertSeedMedia(payload, 'lks-ntb-2021.png', 'LKS SMK Provincial NTB 2021 2nd place certificate', path.join('certificates', 'lks-ntb-2021.png')),
     bangkit: await upsertSeedMedia(payload, 'bangkit-mobile-dev.jpeg', 'Certificate of Completion as Mobile Dev Cohort - Bangkit Academy certificate', path.join('certificates', 'bangkit-mobile-dev.jpeg')),
@@ -329,7 +477,7 @@ export async function seedContent(payload: Payload): Promise<void> {
       name: 'Dinta Syaifuddin',
       headline: 'Fullstack Software Engineer',
       bio: richText([
-        paragraph("I'm a Software Engineer with experience in Frontend, Backend, Mobile and ML/IoT integration. Informatics Engineering graduate (B.Inf) from University of Mataram, based in Lombok, Indonesia."),
+        paragraph("I'm a Software Engineer with experience in Fullstack Web Dev, Mobile and ML/IoT integration. Informatics Engineering graduate (B.Inf) from University of Mataram based in Lombok, Indonesia."),
         heading('Experience'),
         bulletList([
           'Batii, Fullstack Contract Based (Feb 2026 - Present): migrated existing modules into a new integrated micro frontend app using Angular, and used C# to build an API-based app with a PostgreSQL database.',
@@ -360,6 +508,8 @@ export async function seedContent(payload: Payload): Promise<void> {
         { keyword: 'CV Tech Solution', image: previewAssets.tec.id, label: 'CV. TEC Solution project work certificate' },
       ],
       avatar: avatar.id,
+      avatarAlt: avatarAlt.id,
+      resumeFile: null,
       portfolioPdf: portfolioPdf.id,
     },
     overrideAccess: true,
@@ -389,13 +539,13 @@ export async function seedContent(payload: Payload): Promise<void> {
       description: richText([paragraph('Slipakar is an open-source, self-hostable platform for personalized bulk email. It lets a company send messages through its own SMTP server and optionally attach a personalized PDF, such as an employee payslip, to each recipient. The primary use case is HR, finance, or operations uploading a spreadsheet, mapping its columns to a reusable email or PDF template, previewing the result, and sending a campaign without writing code.')]) as Project['description'],
       features: [
         { title: 'Projects, SMTP & Templates', text: 'Projects organize SMTP connections, email templates, uploads, PDF templates, and campaigns. SMTP credentials are configured per project and encrypted at rest with APPENCRYPTIONKEY (never returned in API views). Email templates use safe {{placeholder}} substitution without evaluat' },
-        { title: 'Data Upload, Mapping & PDF Builder', text: 'Upload recipient data from CSV, XLSX, or JSON files and map columns to template placeholders. Build personalized PDF templates using a visual node builder (text, table, image, and divider nodes); generated PDFs and extra shared attachments are stored in Garage.' },
+        { title: 'Data Upload, Mapping & PDF Builder', text: 'Upload recipient data from CSV, XLSX, or JSON files and map columns to template placeholders. Build personalized PDF templates using a visual node builder (text, table, image, and divider nodes). Generated PDFs and extra shared attachments are stored in Garage.' },
         { title: 'Campaigns', text: 'Queued through RabbitMQ and sent asynchronously in the background with Redis token-bucket rate limiting per SMTP connection, per-recipient status tracking, and automatic retries for transient SMTP failures.' },
         { title: 'Notifications & Announcements', text: 'Campaign notifications (campaignfinished, sendfailed) and admin announcements (UserNotice from broadcasts) appear in the user app with unread badges.' },
         { title: 'User Profile & Theme Preferences', text: 'Users can edit their display name, upload or reset a custom avatar (PNG/JPEG/WebP up to 2 MB, magic-byte verified, stored in Garage), and change their email address (always requires clicking a verification link sent to the new address). Account-saved theme preferences support lig' },
         { title: 'Login Activity', text: 'Records sign-in events with resolved client IP, a best-effort proxy indicator, parsed browser/OS/device type, and offline geolocation via geoip-lite ( retained for LOGINEVENTRETENTION_DAYS, default 90 days). Optional map previews load OpenStreetMap raster tiles on demand only whe' },
         { title: 'Admin Web', text: 'Manage users (view, edit name/image, disable/enable accounts with immediate session revocation), compose and send broadcasts to all users, by role, or selected users, audit login activity across all accounts, toggle instance feature flags (scalardocs, pdfbuilder, self_signup), vi' },
-        { title: 'OpenAPI & Observability', text: 'Scalar OpenAPI reference at /docs and specification at /openapi.json (requires authentication; toggleable via scalar_docs). Prometheus scrapes /metrics for Grafana dashboards, Uptime Kuma monitors service health, API error logs are persisted to object storage, and browser Sentry ' },
+        { title: 'OpenAPI & Observability', text: 'Scalar OpenAPI reference at /docs and specification at /openapi.json (requires authentication, toggleable via scalar_docs). Prometheus scrapes /metrics for Grafana dashboards, Uptime Kuma monitors service health, API error logs are persisted to object storage, and browser Sentry ' },
       ],
       architecture: {
         summary: '',
@@ -414,7 +564,21 @@ export async function seedContent(payload: Payload): Promise<void> {
       },
       techStack: [], featured: true, order: 10, source: 'github',
       githubRepo: 'dxxta/slipakar', repoUrl: 'https://github.com/dxxta/slipakar',
+      liveUrl: 'https://slipakar.akarun.site',
       lockedFields: ['title'],
+      coverImageFile: '01-sign-up.png',
+      coverImageAlt: 'Demo screenshot 1 of slipakar',
+      galleryImageFiles: [
+        { filename: '02-verification-email.png', alt: 'Demo screenshot 2 of slipakar' },
+        { filename: '03-sign-in.png', alt: 'Demo screenshot 3 of slipakar' },
+        { filename: '04-projects-empty.png', alt: 'Demo screenshot 4 of slipakar' },
+        { filename: '05-project-overview.png', alt: 'Demo screenshot 5 of slipakar' },
+        { filename: '06-smtp-connection.png', alt: 'Demo screenshot 6 of slipakar' },
+        { filename: '07-email-template.png', alt: 'Demo screenshot 7 of slipakar' },
+        { filename: '08-data-upload.png', alt: 'Demo screenshot 8 of slipakar' },
+        { filename: '09-field-mapping.png', alt: 'Demo screenshot 9 of slipakar' },
+        { filename: '10-campaign-create.png', alt: 'Demo screenshot 10 of slipakar' },
+      ],
     },
     {
       title: 'Notakar',
@@ -431,7 +595,9 @@ export async function seedContent(payload: Payload): Promise<void> {
       description: projectDescription('Integrated REST API with a cheating detection model (YOLOv5) through RTSP protocol.', 2024),
       techStack: technologyIDs([]), featured: true, order: 20, source: 'github',
       githubRepo: 'dxxta/cheating-detection-api', repoUrl: 'https://github.com/dxxta/cheating-detection-api',
+      liveUrl: 'https://docs-bye-cheating.web.app',
       lockedFields: ['title', 'summary', 'description'],
+      coverImageFile: null,
     },
     {
       title: 'FundConn: Web3 Crowdfunding Platform Based on Ethereum',
@@ -440,7 +606,18 @@ export async function seedContent(payload: Payload): Promise<void> {
       description: projectDescription("Management system for event organizers' funding using blockchain technologies.", 2024),
       techStack: technologyIDs([]), featured: true, order: 30, source: 'github',
       githubRepo: 'dxxta/fundconn', repoUrl: 'https://github.com/dxxta/fundconn',
+      liveUrl: null,
       lockedFields: ['title', 'summary', 'description'],
+      coverImageFile: 'e2e-01-home-demo-banner.png',
+      coverImageAlt: 'Demo screenshot 1 of fundconn',
+      galleryImageFiles: [
+        { filename: 'e2e-02-projects-list.png', alt: 'Demo screenshot 2 of fundconn' },
+        { filename: 'e2e-03-project-detail-active.png', alt: 'Demo screenshot 3 of fundconn' },
+        { filename: 'e2e-04-project-detail-expired.png', alt: 'Demo screenshot 4 of fundconn' },
+        { filename: 'website-2.png', alt: 'Demo screenshot 5 of fundconn' },
+        { filename: 'website-3.png', alt: 'Demo screenshot 6 of fundconn' },
+        { filename: 'website.png', alt: 'Demo screenshot 7 of fundconn' },
+      ],
     },
     {
       title: 'Edusign: American Sign Language App',
@@ -448,7 +625,8 @@ export async function seedContent(payload: Payload): Promise<void> {
       summary: 'Mobile application designed to facilitate the learning and practice of American Sign Language (ASL) through the integration of machine learning technology.',
       description: projectDescription('Mobile application designed to facilitate the learning and practice of American Sign Language (ASL) through the integration of machine learning technology.', 2024),
       techStack: technologyIDs(['Jetpack Compose', 'Kotlin']), featured: true, order: 40, source: 'manual',
-      githubRepo: null, repoUrl: null, lockedFields: [],
+      githubRepo: null, repoUrl: null, liveUrl: null, lockedFields: [],
+      coverImageFile: null,
     },
     {
       title: 'ColorSorter: Integrated Real-time IoT System with Telegram Bot',
@@ -499,4 +677,5 @@ export async function seedContent(payload: Payload): Promise<void> {
   ]
   await removeObsoleteShowcases(payload, showcases.map(({ title }) => title))
   for (const showcase of showcases) await upsertShowcase(payload, showcase)
+  await seedGalleryImages(payload)
 }
