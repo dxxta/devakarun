@@ -175,10 +175,17 @@
   transition: transform 140ms ease-out, box-shadow 140ms ease-out;
 }
 
+/* Buttons: the shadow stays put below; the face sinks 3px into it. */
+[data-pressable='button'],
+[data-pressable='icon'] {
+  --press-x: 0px;
+  --press-y: 3px;
+}
+
 [data-pressable='button']:not(:disabled):not([aria-disabled='true']),
 [data-pressable='icon']:not(:disabled):not([aria-disabled='true']) {
   border-color: var(--ink-fixed);
-  box-shadow: var(--shadow-hard);
+  box-shadow: 0 4px 0 var(--shadow-color);
 }
 
 [data-pressable='icon'] {
@@ -188,10 +195,15 @@
   border-radius: var(--radius-control);
 }
 
+/* Header navigation icon buttons (search, theme, menu) are fully rounded. */
+[data-pressable='icon'][data-shape='round'] {
+  border-radius: var(--radius-pill);
+}
+
 [data-pressable='button']:hover:not(:disabled):not([aria-disabled='true']):not([data-pressed]),
 [data-pressable='icon']:hover:not(:disabled):not([aria-disabled='true']):not([data-pressed]) {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
+  box-shadow: 0 6px 0 var(--shadow-color);
 }
 
 [data-pressable='card'] {
@@ -221,7 +233,7 @@
 [data-pressable='button'][data-pressed]:not(:disabled):not([aria-disabled='true']),
 [data-pressable='icon'][data-pressed]:not(:disabled):not([aria-disabled='true']) {
   transform: translate(var(--press-x), var(--press-y));
-  box-shadow: var(--shadow-pressed);
+  box-shadow: 0 1px 0 var(--shadow-color);
 }
 
 [data-pressable='card'][data-pressed]:hover:not(:disabled):not([aria-disabled='true']),

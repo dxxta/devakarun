@@ -109,7 +109,7 @@ export function SearchDrawer() {
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button aria-label="Open search" className="size-11" size="icon" type="button" variant="outline">
+        <Button aria-label="Open search" className="size-11" data-shape="round" size="icon" type="button" variant="outline">
           <IconSearch aria-hidden="true" className="size-5" />
         </Button>
       </SheetTrigger>

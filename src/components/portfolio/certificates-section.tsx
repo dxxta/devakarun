@@ -60,7 +60,7 @@ export async function CertificatesSection() {
       </h2>
       <PaginatedGrid label="Certificates pages" pageSize={4}>
         {docs.map((certificate) => (
-          <Card className="relative h-full w-full gap-4" data-pressable="card" key={certificate.id}>
+          <Card className="relative h-full w-full gap-3" data-pressable="card" key={certificate.id}>
             <MediaImage
               alt={certificate.title}
               className="aspect-[4/3] w-full rounded-control"
@@ -73,24 +73,24 @@ export async function CertificatesSection() {
                 Highlight
               </Badge>
             ) : null}
-            <CardHeader className="min-w-0 gap-2 p-0">
-              <CardTitle className="line-clamp-2 min-h-[2.5em]">{certificate.title}</CardTitle>
-              <p className="m-0 truncate text-muted-foreground">{certificate.issuer}</p>
+            <CardHeader className="flex min-w-0 flex-1 flex-col gap-2 p-0">
+              <CardTitle className="line-clamp-2">{certificate.title}</CardTitle>
+              <p className="m-0 mt-auto line-clamp-2 text-muted-foreground">{certificate.issuer}</p>
             </CardHeader>
-            <CardContent className="grid min-h-12 gap-1 p-0 text-sm text-muted-foreground">
+            <CardContent className="mt-auto grid gap-1 p-0 text-sm text-muted-foreground">
               <p className="m-0">Issued {formatDate(certificate.issueDate)}</p>
-              <p className="m-0">{certificate.expiryDate ? `Expires ${formatDate(certificate.expiryDate)}` : '\u00a0'}</p>
+              {certificate.expiryDate ? <p className="m-0">Expires {formatDate(certificate.expiryDate)}</p> : null}
             </CardContent>
             {certificate.credentialUrl ? (
               <a
-                className="mt-auto font-semibold underline underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+                className="font-semibold underline underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
                 href={certificate.credentialUrl}
                 rel="noreferrer"
                 target="_blank"
               >
                 View credential
               </a>
-            ) : <span aria-hidden="true" className="mt-auto min-h-6" />}
+            ) : null}
           </Card>
         ))}
       </PaginatedGrid>

@@ -107,6 +107,7 @@ export function SiteHeader() {
             <Button
               aria-label="Open navigation menu"
               className="size-11 md:hidden"
+              data-shape="round"
               size="icon"
               variant="outline"
             >

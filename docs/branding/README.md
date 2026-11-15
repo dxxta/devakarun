@@ -76,7 +76,7 @@ If you change `--shadow-hard`, change the press offsets to match.
 
 - **Primary button** (`default`, also `secondary`, `destructive`, and `quiet` for secondary actions such as "About me"): filled, ink text, 3px ink border, hard shadow, pill.
 - **Flat button** (`outline`, `ghost`, `link`): outlined, no shadow, only changes colour. Used for chips and grouped controls.
-- **Icon button**: square 2.75rem, 2px ink border, `--radius-control`, hard shadow; lifts and presses like a button.
+- **Icon button**: 2.75rem square with `--radius-control`, 2px ink border, hard shadow (only the header search, theme and menu buttons are fully rounded); lifts and presses like a button.
 - **Cards, drawers, modals**: `--card` fill, 2px `--ink-fixed` border (not the soft `--border`), 1rem radius, `--shadow-hard`. Drawer for long content; centred modal for short confirmations and forms up to three fields.
 - **Inputs**: 2px `--border`, `--radius-control`, `--card` background.
 - **Grouped controls**: the group owns the border and shadow; items have neither.
@@ -89,9 +89,9 @@ Elements sit on their shadow, lift on hover and sink into it when pressed. Trans
 
 | State | Buttons and icon buttons | Cards (only when the whole card is a link or action) |
 | --- | --- | --- |
-| Rest | `--shadow-hard` | 3px border, 1.5rem radius, `5px 5px 0` shadow |
-| Hover | `translateY(-2px)`, `--shadow-hover` | `translateY(-3px)` plus a 0.5° tilt (alternating on even items), same shadow |
-| Pressed | `translate(3px, 3px)`, `--shadow-pressed` | `translate(5px, 5px)`, shadow `0 0 0` |
+| Rest | `0 4px 0` | 3px border, 1.5rem radius, `5px 5px 0` shadow |
+| Hover | `translateY(-2px)`, shadow `0 6px 0` | `translateY(-3px)` plus a 0.5° tilt (alternating on even items), same shadow |
+| Pressed | `translateY(3px)`, shadow `0 1px 0` (the shadow stays put; the face sinks into it) | `translate(5px, 5px)`, shadow `0 0 0` |
 | Disabled | 55% opacity, no hover, no press | no press |
 
 How it is wired:
@@ -107,7 +107,7 @@ Hero and section actions (GitHub, "About me", "Live site", "View all") are butto
 - Secondary action beside it, such as "About me": `Button variant="quiet"`. It has the same hard shadow, hover lift and press as the primary. Never render it as a flat outlined button or a plain link.
 - `Button` sets `data-pressable="button"` itself; do not add it by hand. For links use `<Button asChild><Link ...>`.
 - Do not wrap a button in a pressable card, or nest two pressable elements.
-- Icon-only actions use `size="icon"` (square 2.75rem, `--radius-control`) with the same press.
+- Icon-only actions use `size="icon"` (2.75rem, `--radius-control`; header search, theme and menu are fully rounded) with the same press.
 - `outline`, `ghost` and `link` stay flat; do not use them for landing actions.
 - Buttons move 3px and their shadow shrinks to `1px 1px 0`; cards move 5px and their shadow goes flat. Keep the two distinct.
 
