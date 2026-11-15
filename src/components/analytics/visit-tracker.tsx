@@ -9,7 +9,7 @@ export function VisitTracker() {
   const pathname = usePathname()
 
   useEffect(() => {
-    if (!pathname || pathname === '/admin' || pathname.startsWith('/admin/') || pathname === '/api' || pathname.startsWith('/api/')) return
+    if (!pathname || pathname === '/console' || pathname.startsWith('/console/') || pathname === '/api' || pathname.startsWith('/api/')) return
     if (new URLSearchParams(window.location.search).get('preview') === 'true') return
 
     const storageKey = `page-visit:${pathname}`

@@ -7,7 +7,7 @@ test('homepage responds successfully', async ({ page }) => {
 })
 
 test('admin requires anonymous visitors to log in', async ({ page }) => {
-  await page.goto('/admin')
+  await page.goto('/console')
 
   await expect(page.locator('form')).toBeVisible()
   await expect(page.locator('input[type="email"]')).toBeVisible()

@@ -35,7 +35,7 @@ export function countryFromHeaders(headers: Headers): string {
 export function normalizeAnalyticsPath(value: unknown): string | null {
   if (typeof value !== 'string' || value.length > 250) return null
   if (!value.startsWith('/') || value.startsWith('//') || /[?#\\]/.test(value)) return null
-  if (value === '/admin' || value.startsWith('/admin/') || value === '/api' || value.startsWith('/api/')) return null
+  if (value === '/console' || value.startsWith('/console/') || value === '/api' || value.startsWith('/api/')) return null
   return value
 }
 

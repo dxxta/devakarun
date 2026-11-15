@@ -1,6 +1,6 @@
 # dev.akarun
 
-Personal site with an About page and blog. Next.js (App Router) + Payload CMS 3 + shadcn/ui, PostgreSQL. All content, including certificates, tech stack and projects, is managed in Payload (`/admin`), which only the owner can log into.
+Personal site with an About page and blog. Next.js (App Router) + Payload CMS 3 + shadcn/ui, PostgreSQL. All content, including certificates, tech stack and projects, is managed in Payload (`/console`), which only the owner can log into.
 
 ## Run it locally
 
@@ -8,7 +8,7 @@ Personal site with an About page and blog. Next.js (App Router) + Payload CMS 3 
 pnpm install
 cp .env.example .env          # then fill DATABASE_URI, PAYLOAD_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD
 docker compose up -d postgres
-pnpm dev                      # http://localhost:3000  (admin: /admin)
+pnpm dev                      # http://localhost:3000  (admin: /console)
 ```
 
 The portfolio (profile, 28 technologies, 16 certificates with images, nine
@@ -19,7 +19,7 @@ upsert manually, run
 `pnpm payload run src/seed/run.ts`. Blog sample content is manual only:
 `pnpm payload run src/seed/run-blog.ts`.
 
-Projects are sourced from GitHub. In `/admin`, create a project, set Source to
+Projects are sourced from GitHub. In `/console`, create a project, set Source to
 `github`, enter the repository as `owner/name`, and click "Sync from GitHub".
 Optional screenshots go in `docs/demos/` as PNG, JPG/JPEG, WebP, or GIF files;
 the first image alphabetically is the cover and the rest populate the gallery.

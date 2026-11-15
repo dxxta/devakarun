@@ -18,13 +18,13 @@ export async function login({
   serverURL = 'http://localhost:3000',
   user,
 }: LoginOptions): Promise<void> {
-  await page.goto(`${serverURL}/admin/login`)
+  await page.goto(`${serverURL}/console/login`)
 
   await page.fill('#field-email', user.email)
   await page.fill('#field-password', user.password)
   await page.click('button[type="submit"]')
 
-  await page.waitForURL(`${serverURL}/admin`)
+  await page.waitForURL(`${serverURL}/console`)
 
   const dashboardArtifact = page.locator('span[title="Dashboard"]')
   await expect(dashboardArtifact).toBeVisible()

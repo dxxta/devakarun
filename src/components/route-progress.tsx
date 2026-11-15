@@ -62,7 +62,7 @@ export function RouteProgress() {
   }, [])
 
   useEffect(() => {
-    if (pathname.startsWith('/admin')) return
+    if (pathname.startsWith('/console')) return
 
     const onClick = (event: MouseEvent) => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
@@ -99,7 +99,7 @@ export function RouteProgress() {
 
   useEffect(() => () => stopTimers(), [stopTimers])
 
-  if (pathname.startsWith('/admin')) return null
+  if (pathname.startsWith('/console')) return null
 
   return (
     <div

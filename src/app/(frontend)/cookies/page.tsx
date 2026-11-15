@@ -22,7 +22,7 @@ const storageItems = [
   },
   {
     name: 'payload-token',
-    purpose: 'Keeps an administrator signed in to the Payload control panel at /admin.',
+    purpose: 'Keeps an administrator signed in to the Payload control panel at /console.',
     setBy: 'Payload, only for administrators.',
     duration: 'Two hours by default.',
     essential: 'Needed only for admin access.',

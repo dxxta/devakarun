@@ -42,7 +42,7 @@ pnpm dev
 ```
 
 - Site: http://localhost:3000
-- Admin: http://localhost:3000/admin, log in with `ADMIN_EMAIL` / `ADMIN_PASSWORD`. The admin account is created (or its password updated) from `.env` every time the app starts. Registration is disabled.
+- Admin: http://localhost:3000/console, log in with `ADMIN_EMAIL` / `ADMIN_PASSWORD`. The admin account is created (or its password updated) from `.env` every time the app starts. Registration is disabled.
 - In dev, the database schema is pushed automatically when you change a collection.
 
 ## 4. About page content
@@ -55,7 +55,7 @@ merged portfolio PDF. Byecheating, FundConn, ColorSorter, Slipakar, and Notakar
 are GitHub-backed; the app syncs their repo data while retaining resume copy
 for the three linked resume projects. `SEED_CONTENT=false` disables this
 first-boot seed.
-Afterward, make content changes in `/admin`; existing content is not overwritten
+Afterward, make content changes in `/console`; existing content is not overwritten
 on later boots. Blog sample content remains manual only.
 The home Profile global can set an optional `avatarAlt` photo that appears with a brief glitch on hover, keyboard focus, or tap.
 
@@ -144,7 +144,7 @@ under Engagement. Old view rows can be pruned when needed.
 ### Gallery images
 
 The gallery combines certificate images, project screenshots, and event photos.
-Manage free-standing event images in `/admin` under Gallery Images. The portfolio
+Manage free-standing event images in `/console` under Gallery Images. The portfolio
 seed uses the files in `seed-assets/gallery/`; run `pnpm payload run
 src/seed/run-gallery.ts` to upsert only those gallery records without reseeding
 profile or project content. Gallery photo uploads reference the Media collection.
@@ -152,7 +152,7 @@ The public gallery is paginated at 12 images per page.
 
 ### Feature flags
 
-In `/admin` → Site Settings → Feature flags, the owner can hide profile CV and
+In `/console` → Site Settings → Feature flags, the owner can hide profile CV and
 portfolio PDF download actions or hide Gallery links from the header, mobile
 menu, footer, and sitemap. Both flags default to on, and `/gallery` returns a
 404 while its flag is off. Missing settings or a failed settings read keep both
@@ -166,7 +166,7 @@ A scrolling bar is fixed at the top of every page. By default it alternates
 `/contact`, and "Only essential cookies here, no ads or trackers." with a
 "Cookie details" link to `/cookies`. The Cookies page explains the site's
 first-party cookies and browser storage.
-To change it, open `/admin` → Site Settings → Top marquee and set a message, an
+To change it, open `/console` → Site Settings → Top marquee and set a message, an
 optional link label and link URL, or untick "Show marquee" to hide it. If the
 message is empty the default is used. The seed does not touch these fields, so
 re-running it never overwrites marquee edits. The columns come from the
@@ -210,7 +210,7 @@ tests/int, tests/e2e  Vitest and Playwright tests
 
 ## Optional features locally
 
-**Google sign-in (comments).** Create an OAuth client in Google Cloud Console with redirect URI `http://localhost:3000/api/auth/callback/google`, then set `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` and `AUTH_SECRET` (`openssl rand -hex 32`) in `.env` and restart `pnpm dev`. Approve comments in `/admin` under Comments (they start as `pending`).
+**Google sign-in (comments).** Create an OAuth client in Google Cloud Console with redirect URI `http://localhost:3000/api/auth/callback/google`, then set `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` and `AUTH_SECRET` (`openssl rand -hex 32`) in `.env` and restart `pnpm dev`. Approve comments in `/console` under Comments (they start as `pending`).
 
 **GitHub projects.** On first app boot, Byecheating, FundConn, and ColorSorter
 are linked to GitHub while retaining their resume title, summary, and
@@ -218,7 +218,7 @@ description. Slipakar is added as a GitHub project whose title, summary, and
 description sync from its repository. The default repositories are
 `dxxta/slipakar`, `dxxta/fundconn`, `dxxta/Cheating-Detection-API`, and
 `dxxta/Color-Sorter-IoT-Telegram`. To add another repository,
-open `/admin`, create a project, set Source to `github`, enter its GitHub repo as
+open `/console`, create a project, set Source to `github`, enter its GitHub repo as
 `owner/name`, then click "Sync from GitHub". Put optional screenshots in the
 repository's `docs/demos/` folder using PNG, JPG/JPEG, WebP, or GIF files; the
 first image alphabetically becomes the cover and the rest become the gallery.

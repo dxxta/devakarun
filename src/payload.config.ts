@@ -58,6 +58,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
+  routes: { admin: '/console' },
   collections: [Users, Media, ...portfolioCollections, ...blogCollections, ...engagementCollections],
   globals: [...portfolioGlobals],
   editor: lexicalEditor({

@@ -136,7 +136,7 @@ resume text protected; Slipakar's title is protected while its other project
 details come from its repository. Notakar is linked to GitHub and starts
 unhighlighted. All five GitHub-backed projects sync repository metadata,
 language, topics, and optional
-`docs/demos/` images. To add another project, open `/admin`, create a project, set Source to
+`docs/demos/` images. To add another project, open `/console`, create a project, set Source to
 `github`, enter `owner/name` in GitHub repo, and click "Sync from GitHub".
 Screenshots in `docs/demos/` can be PNG, JPG/JPEG, WebP, or GIF; the first image
 alphabetically becomes the cover and remaining images become the gallery. Set
@@ -195,7 +195,7 @@ Profile global has no name. This includes the profile, 28 technologies, 16
 certificates and images, nine projects (five GitHub-backed), eight showcase
 pages, and the merged portfolio PDF; startup then syncs GitHub project data.
 Set `SEED_CONTENT=false` to disable the first-boot seed. Existing content is
-not overwritten on later boots; edit it in `/admin`. To intentionally
+not overwritten on later boots; edit it in `/console`. To intentionally
 reapply the portfolio upsert, run `pnpm payload run src/seed/run.ts`. Blog sample
 content is manual only and is not part of startup seeding.
 
@@ -207,7 +207,7 @@ content is manual only and is not part of startup seeding.
 - [ ] PostgreSQL reports healthy and the initial Payload migration has run.
 - [ ] Traefik routes port 3000 and HTTPS is active.
 - [ ] `https://dev.akarun.site/api/health` returns `{"status":"ok"}`.
-- [ ] Owner can sign in at `/admin` with the seeded admin credentials.
+- [ ] Owner can sign in at `/console` with the seeded admin credentials.
 - [ ] The owner's profile, projects, tech stack, certificates, and certificate
       images appear after the first boot (unless `SEED_CONTENT=false` is set).
 - [ ] Google OAuth and Turnstile work if enabled.
