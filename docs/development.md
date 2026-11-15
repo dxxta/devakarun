@@ -54,9 +54,10 @@ with their certificate images, nine projects, eight showcase pages, and the
 merged portfolio PDF. Byecheating, FundConn, ColorSorter, Slipakar, and Notakar
 are GitHub-backed; the app syncs their repo data while retaining resume copy
 for the three linked resume projects. `SEED_CONTENT=false` disables this
-first-boot seed.
+first-boot seed, and `SEED_ALL=true` forces all seeds on the next boot.
+On that same first boot the gallery images and the blog (categories, tags and posts) are seeded too.
 Afterward, make content changes in `/console`; existing content is not overwritten
-on later boots. Blog sample content remains manual only.
+on later boots. The blog seed is not repeated after first boot; to add it to an existing site run `pnpm payload run src/seed/run-blog.ts`.
 The home Profile global can set an optional `avatarAlt` photo that appears with a brief glitch on hover, keyboard focus, or tap.
 
 To intentionally reapply the portfolio seed after editing the seed source, run

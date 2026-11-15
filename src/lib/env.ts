@@ -25,6 +25,7 @@ const envSchema = z.object({
   GITHUB_TOKEN: z.preprocess((value) => value === '' ? undefined : value, z.string().optional()),
   CRON_SECRET: z.preprocess((value) => value === '' ? undefined : value, z.string().optional()),
   SEED_CONTENT: z.preprocess((value) => value === '' ? undefined : value, z.string().optional()),
+  SEED_ALL: z.preprocess((value) => value === '' ? undefined : value, z.string().optional()),
 })
 
 export type Env = z.infer<typeof envSchema>

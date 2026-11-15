@@ -56,7 +56,8 @@ service hostname `postgres`, and its database, username, and password must match
 | `AUTH_GOOGLE_SECRET` | Optional | Google OAuth client secret. |
 | `GITHUB_TOKEN` | Optional | GitHub API token for repository metadata, README files, and demo images; raises the API rate limit. |
 | `CRON_SECRET` | Optional | Shared secret for scheduled GitHub project sync requests. |
-| `SEED_CONTENT` | Optional | Set to `false` to disable automatic first-boot portfolio seeding. |
+| `SEED_CONTENT` | Optional | Set to `false` to disable automatic first-boot seeding (portfolio, gallery and blog). |
+| `SEED_ALL` | Optional | Set to `true` for one deploy to run all seeds (portfolio, gallery, blog) even when content exists. It resets portfolio content to the seed values, so remove it after that boot. |
 
 The app requires all six variables marked Yes for startup. Add SMTP,
 Turnstile, and Google OAuth values when enabling those features. The Docker
@@ -196,8 +197,11 @@ certificates and images, nine projects (five GitHub-backed), eight showcase
 pages, and the merged portfolio PDF; startup then syncs GitHub project data.
 Set `SEED_CONTENT=false` to disable the first-boot seed. Existing content is
 not overwritten on later boots; edit it in `/console`. To intentionally
-reapply the portfolio upsert, run `pnpm payload run src/seed/run.ts`. Blog sample
-content is manual only and is not part of startup seeding.
+reapply the portfolio upsert, run `pnpm payload run src/seed/run.ts`. First boot
+also seeds the gallery images and the blog. To seed an already-deployed site
+(for example an empty blog), set `SEED_ALL=true` in the Dokploy environment,
+redeploy once, then remove it. `SEED_ALL` overwrites portfolio content edited in
+`/console` with the seed values.
 
 - [ ] DNS for `dev.akarun.site` points to the Dokploy VPS.
 - [ ] Dokploy uses `docker-compose.prod.yml` and all required values are set in
