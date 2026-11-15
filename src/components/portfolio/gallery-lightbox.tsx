@@ -67,12 +67,12 @@ export function GalleryLightbox({
           ))}
         </PaginatedGrid>
       ) : (
-        <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:snap-none md:grid-cols-3 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {images.map((image, index) => (
             <DialogPrimitive.Trigger asChild key={image.id} onClick={() => setActiveIndex(index)}>
               <button
                 aria-label={`View ${image.title} screenshot`}
-                className="group relative aspect-[4/3] w-[78%] min-w-0 shrink-0 snap-center overflow-hidden rounded-card border-2 border-border bg-muted text-left focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink md:w-auto md:shrink md:snap-none"
+                className="group relative aspect-[4/3] min-w-0 overflow-hidden rounded-card border-2 border-border bg-muted text-left focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
                 data-pressable="card"
                 type="button"
               >

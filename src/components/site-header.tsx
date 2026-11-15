@@ -90,15 +90,21 @@ export function SiteHeader() {
     <header className="flex min-h-16 items-center justify-between gap-3 rounded-full border-2 border-ink-fixed bg-card px-4 shadow-hard md:px-6">
       <Link
         aria-label="dev.akarun home"
-        className="shrink-0"
+        aria-current={pathname === '/' ? 'page' : undefined}
+        className="group shrink-0"
         href="/"
       >
-        <Wordmark />
+        <Wordmark className="decoration-2 underline-offset-4 group-hover:underline group-aria-[current=page]:underline" />
       </Link>
 
       <nav aria-label="Main navigation" className="hidden items-center gap-6 md:flex">
         {links.map(({ href, label }) => (
-          <Link className="font-medium underline-offset-4 hover:underline" href={href} key={href}>
+          <Link
+            aria-current={pathname === href || pathname.startsWith(`${href}/`) ? 'page' : undefined}
+            className="font-medium underline-offset-4 decoration-2 hover:underline aria-[current=page]:underline"
+            href={href}
+            key={href}
+          >
             {label}
           </Link>
         ))}

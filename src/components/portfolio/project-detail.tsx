@@ -118,11 +118,11 @@ export function ProjectDetail({ project }: { project: Project }) {
       {gallery.length > 0 ? (
         <section aria-labelledby="project-gallery-heading" className="grid gap-5">
           <h2 className="m-0 font-display text-2xl font-bold" id="project-gallery-heading">Gallery</h2>
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0">
             {gallery.map((image, index) => (
               <MediaImage
                 alt={`${project.title} gallery image ${index + 1}`}
-                className="aspect-video w-full"
+                className="aspect-video w-[85%] shrink-0 snap-center sm:w-full sm:shrink sm:snap-none"
                 key={typeof image === 'object' ? image.id : index}
                 media={image}
                 sizes="(min-width: 640px) 50vw, 100vw"
