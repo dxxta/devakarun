@@ -25,18 +25,9 @@ type SourceCache = {
   height: number
 }
 
-type GlitchBlock = {
-  x: number
-  y: number
-  width: number
-  height: number
-  shift: number
-  color: string
-}
-
 const TRANSITION_MS = 900
-const CROSSFADE_START = 0.46
-const CROSSFADE_END = 0.54
+const GRID_COLUMNS = 14
+const FLASH_BAND = 0.09
 const COLORS = ['#d4f03c', '#d4f03c', '#d4f03c', '#d4f03c', '#d4f03c', '#d4f03c', '#d4f03c', '#000000', '#000000', '#ffffff']
 
 function clamp(value: number, min: number, max: number) {
@@ -72,9 +63,10 @@ async function decodeImage(image: HTMLImageElement): Promise<boolean> {
   }
 }
 
-function drawCoverCrop(context: CanvasRenderingContext2D, image: HTMLImageElement, width: number, height: number) {
-  const sourceWidth = image.naturalWidth
-  const sourceHeight = image.naturalHeight
+function drawCoverCrop(context: CanvasRenderingContext2D, image: ImageBitmap, width: number, height: number) {
+  // Bitmap size is the real pixel size; img.naturalWidth is divided by the srcset density on retina screens.
+  const sourceWidth = image.width
+  const sourceHeight = image.height
   const sourceAspect = sourceWidth / sourceHeight
   const targetAspect = width / height
   let sourceX = 0
@@ -93,7 +85,8 @@ function drawCoverCrop(context: CanvasRenderingContext2D, image: HTMLImageElemen
   context.drawImage(image, sourceX, sourceY, cropWidth, cropHeight, 0, 0, width, height)
 }
 
-function createSourceCanvas(image: HTMLImageElement, width: number, height: number) {
+async function createSourceCanvas(element: HTMLImageElement, width: number, height: number) {
+  const image = await createImageBitmap(element)
   const source = document.createElement('canvas')
   source.width = width
   source.height = height
@@ -101,25 +94,8 @@ function createSourceCanvas(image: HTMLImageElement, width: number, height: numb
   if (!context) throw new Error('Could not create avatar source canvas')
   context.imageSmoothingEnabled = true
   drawCoverCrop(context, image, width, height)
+  image.close()
   return source
-}
-
-function randomBlocks(width: number, height: number): GlitchBlock[] {
-  const count = 3 + Math.floor(Math.random() * 3)
-  const blocks: GlitchBlock[] = []
-  for (let index = 0; index < count; index += 1) {
-    const blockWidth = 1 + Math.floor(Math.random() * Math.max(1, Math.min(4, Math.floor(width / 3))))
-    const blockHeight = 1 + Math.floor(Math.random() * Math.max(1, Math.min(3, Math.floor(height / 4))))
-    blocks.push({
-      x: Math.floor(Math.random() * Math.max(1, width - blockWidth + 1)),
-      y: Math.floor(Math.random() * Math.max(1, height - blockHeight + 1)),
-      width: blockWidth,
-      height: blockHeight,
-      shift: (1 + Math.floor(Math.random() * 3)) * (Math.random() < 0.5 ? -1 : 1),
-      color: COLORS[Math.floor(Math.random() * COLORS.length)] ?? '#d4f03c',
-    })
-  }
-  return blocks
 }
 
 export function GlitchAvatar({ primary, secondary, name, cloudflare, priority = false, sizes, size, className }: GlitchAvatarProps) {
@@ -152,8 +128,6 @@ export function GlitchAvatar({ primary, secondary, name, cloudflare, priority = 
 
     let cancelled = false
     let lastFrameAt = 0
-    let nextBlocksAt = 0
-    let blocks: GlitchBlock[] = []
     const canvas = canvasRef.current
     const frame = frameRef.current
     const primaryImage = primaryRef.current
@@ -206,8 +180,8 @@ export function GlitchAvatar({ primary, secondary, name, cloudflare, priority = 
         if (!sources || sources.key !== cacheKey) {
           sources = {
             key: cacheKey,
-            primary: createSourceCanvas(primaryImage, canvasWidth, canvasHeight),
-            secondary: createSourceCanvas(secondaryImage, canvasWidth, canvasHeight),
+            primary: await createSourceCanvas(primaryImage, canvasWidth, canvasHeight),
+            secondary: await createSourceCanvas(secondaryImage, canvasWidth, canvasHeight),
             width: canvasWidth,
             height: canvasHeight,
           }
@@ -220,9 +194,11 @@ export function GlitchAvatar({ primary, secondary, name, cloudflare, priority = 
         }
         const context = canvas.getContext('2d')
         if (!context) throw new Error('Could not create visible avatar canvas')
-        const tinyCanvas = document.createElement('canvas')
-        const tinyContext = tinyCanvas.getContext('2d')
-        if (!tinyContext) throw new Error('Could not create pixel canvas')
+        const cell = Math.max(2, Math.ceil(sources.width / GRID_COLUMNS))
+        const columns = Math.ceil(sources.width / cell)
+        const rows = Math.ceil(sources.height / cell)
+        const thresholds = Array.from({ length: columns * rows }, () => Math.random())
+        const cellColors = Array.from({ length: columns * rows }, () => COLORS[Math.floor(Math.random() * COLORS.length)] ?? '#d4f03c')
         const direction = transitionTarget ? 1 : -1
 
         const drawFrame = (now: number) => {
@@ -232,58 +208,28 @@ export function GlitchAvatar({ primary, secondary, name, cloudflare, priority = 
           const progress = clamp(progressRef.current + (delta / TRANSITION_MS) * direction, 0, 1)
           progressRef.current = progress
 
-          const pixelationProgress = progress <= 0.5
-            ? easeInOutCubic(progress * 2)
-            : easeInOutCubic((1 - progress) * 2)
-          const maxBlock = Math.max(8, Math.round(Math.max(sources!.width, sources!.height) / 10))
-          const blockSize = Math.max(1, Math.round(1 + (maxBlock - 1) * pixelationProgress))
-          const tinyWidth = Math.max(1, Math.ceil(sources!.width / blockSize))
-          const tinyHeight = Math.max(1, Math.ceil(sources!.height / blockSize))
-          if (tinyCanvas.width !== tinyWidth || tinyCanvas.height !== tinyHeight) {
-            tinyCanvas.width = tinyWidth
-            tinyCanvas.height = tinyHeight
-          }
-          tinyContext.imageSmoothingEnabled = false
-          tinyContext.clearRect(0, 0, tinyWidth, tinyHeight)
-
-          const crossfade = clamp((progress - CROSSFADE_START) / (CROSSFADE_END - CROSSFADE_START), 0, 1)
-          if (progress < CROSSFADE_START) {
-            tinyContext.drawImage(sources!.primary, 0, 0, tinyWidth, tinyHeight)
-          } else if (progress > CROSSFADE_END) {
-            tinyContext.drawImage(sources!.secondary, 0, 0, tinyWidth, tinyHeight)
-          } else {
-            tinyContext.drawImage(sources!.primary, 0, 0, tinyWidth, tinyHeight)
-            tinyContext.globalAlpha = crossfade
-            tinyContext.drawImage(sources!.secondary, 0, 0, tinyWidth, tinyHeight)
-            tinyContext.globalAlpha = 1
-          }
-
+          const eased = easeInOutCubic(progress)
+          const reveal = eased * (1 + FLASH_BAND * 2) - FLASH_BAND
           context.imageSmoothingEnabled = false
           context.globalAlpha = 1
-          context.clearRect(0, 0, sources!.width, sources!.height)
-          context.drawImage(tinyCanvas, 0, 0, sources!.width, sources!.height)
-
-          if (pixelationProgress > 0.12) {
-            if (now >= nextBlocksAt) {
-              blocks = randomBlocks(tinyWidth, tinyHeight)
-              nextBlocksAt = now + 80 + Math.random() * 40
+          for (let row = 0; row < rows; row += 1) {
+            for (let column = 0; column < columns; column += 1) {
+              const index = row * columns + column
+              const threshold = thresholds[index] ?? 0
+              const x = column * cell
+              const y = row * cell
+              const width = Math.min(cell, sources!.width - x)
+              const height = Math.min(cell, sources!.height - y)
+              const source = threshold < reveal ? sources!.secondary : sources!.primary
+              context.drawImage(source, x, y, width, height, x, y, width, height)
+              const distance = Math.abs(threshold - reveal)
+              if (distance < FLASH_BAND && progress > 0 && progress < 1) {
+                context.globalAlpha = 1 - distance / FLASH_BAND
+                context.fillStyle = cellColors[index] ?? '#d4f03c'
+                context.fillRect(x, y, width, height)
+                context.globalAlpha = 1
+              }
             }
-            const cellWidth = sources!.width / tinyWidth
-            const cellHeight = sources!.height / tinyHeight
-            const blockOpacity = 0.42 * pixelationProgress
-            for (const block of blocks) {
-              const sourceX = clamp(block.x - block.shift, 0, tinyWidth - block.width)
-              const drawX = block.x * cellWidth
-              const drawY = block.y * cellHeight
-              const drawWidth = block.width * cellWidth
-              const drawHeight = block.height * cellHeight
-              context.globalAlpha = 1
-              context.drawImage(tinyCanvas, sourceX, block.y, block.width, block.height, drawX, drawY, drawWidth, drawHeight)
-              context.globalAlpha = blockOpacity
-              context.fillStyle = block.color
-              context.fillRect(drawX, drawY, drawWidth, drawHeight)
-            }
-            context.globalAlpha = 1
           }
 
           if ((direction > 0 && progress >= 1) || (direction < 0 && progress <= 0)) {
@@ -358,6 +304,7 @@ export function GlitchAvatar({ primary, secondary, name, cloudflare, priority = 
       aria-label={`Show another photo of ${name}`}
       aria-pressed={showAlt}
       className={`glitch-card border-2 border-border ${size ?? ''} ${className ?? ''}`}
+      data-pressable="card"
       data-fallback={fallback ? 'true' : 'false'}
       data-glitching={animating ? 'true' : 'false'}
       data-show-alt={showAlt ? 'true' : 'false'}

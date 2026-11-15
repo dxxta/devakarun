@@ -62,8 +62,6 @@
 
 .glitch-card {
   position: relative;
-  scale: none;
-  transition: none !important;
   cursor: pointer;
   outline: none;
 }

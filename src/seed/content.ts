@@ -461,9 +461,9 @@ export async function seedContent(payload: Payload): Promise<void> {
   )
   const avatarAlt = await upsertSeedMedia(
     payload,
-    'avatar-hover.jpg',
+    'avatar-swing-full.jpg',
     'Dinta on a swing with mountains behind him',
-    path.join('portfolio', 'avatar-hover.jpg'),
+    path.join('portfolio', 'avatar-swing-full.jpg'),
   )
   const previewAssets = {
     lks: await upsertSeedMedia(payload, 'lks-ntb-2021.png', 'LKS SMK Provincial NTB 2021 2nd place certificate', path.join('certificates', 'lks-ntb-2021.png')),
