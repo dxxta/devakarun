@@ -5,6 +5,7 @@ import * as migration_20261112_022325_project_readme_sections from './20261112_0
 import * as migration_20261112_023016_project_preview_source from './20261112_023016_project_preview_source';
 import * as migration_20261112_032259_profile_list_previews from './20261112_032259_profile_list_previews';
 import * as migration_20261112_041322_portfolio_showcases from './20261112_041322_portfolio_showcases';
+import * as migration_20261115_120000_site_announcement from './20261115_120000_site_announcement';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20261112_041322_portfolio_showcases.up,
     down: migration_20261112_041322_portfolio_showcases.down,
-    name: '20261112_041322_portfolio_showcases'
+    name: '20261112_041322_portfolio_showcases',
+  },
+  {
+    up: migration_20261115_120000_site_announcement.up,
+    down: migration_20261115_120000_site_announcement.down,
+    name: '20261115_120000_site_announcement',
   },
 ];

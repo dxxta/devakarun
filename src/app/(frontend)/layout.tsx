@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { ThemeProvider } from '@/components/theme-provider'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { SiteMarquee } from '@/components/site-marquee'
 import { Toaster } from '@/components/ui/sonner'
 import { fontDisplay, fontSans } from '@/lib/fonts'
 import { PressedProvider } from '@/components/pressed-provider'
@@ -35,7 +36,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <ScrollToTop />
           <PressedProvider />
           <div className="flex min-h-screen w-full flex-col">
-            <div className="sticky top-3 z-40 mt-4 w-full">
+            <Suspense fallback={null}>
+              <SiteMarquee />
+            </Suspense>
+            <div className="site-nav-sticky sticky top-3 z-40 mt-4 w-full">
               <SiteHeader />
             </div>
             <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { IconMenu2 } from '@tabler/icons-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
@@ -18,8 +19,14 @@ const links = [
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const pathname = usePathname()
   const [containerWidths, setContainerWidths] = useState<{ wide: number; narrow: number } | null>(null)
   const headerContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
 
   useEffect(() => {
     let frame = 0
@@ -102,7 +109,7 @@ export function SiteHeader() {
         <div className="hidden sm:block">
           <ThemeToggle />
         </div>
-        <Sheet>
+        <Sheet onOpenChange={setMenuOpen} open={menuOpen}>
           <SheetTrigger asChild>
             <Button
               aria-label="Open navigation menu"
@@ -124,9 +131,11 @@ export function SiteHeader() {
             <nav aria-label="Mobile navigation" className="mt-6 grid gap-2">
               {links.map(({ href, label }) => (
                 <Link
-                  className="rounded-control px-3 py-3 text-lg font-semibold hover:bg-muted"
+                  aria-current={pathname === href || pathname.startsWith(`${href}/`) ? 'page' : undefined}
+                  className="rounded-control px-3 py-3 text-lg font-semibold hover:bg-muted aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground"
                   href={href}
                   key={href}
+                  onClick={() => setMenuOpen(false)}
                 >
                   {label}
                 </Link>

@@ -907,6 +907,18 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteSetting {
   id: number;
+  /**
+   * Scrolling bar fixed at the top of every page. Leave the text empty to keep the default message that points visitors to the contact page.
+   */
+  announcement?: {
+    enabled?: boolean | null;
+    text?: string | null;
+    linkLabel?: string | null;
+    /**
+     * Defaults to /contact when a message is set without a link.
+     */
+    linkUrl?: string | null;
+  };
   siteTitle: string;
   description: string;
   socialLinks?:
@@ -973,6 +985,14 @@ export interface Profile {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  announcement?:
+    | T
+    | {
+        enabled?: T;
+        text?: T;
+        linkLabel?: T;
+        linkUrl?: T;
+      };
   siteTitle?: T;
   description?: T;
   socialLinks?:

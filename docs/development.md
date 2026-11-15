@@ -76,6 +76,16 @@ pnpm payload run src/seed/run-blog.ts
 It creates the starter categories, tags, and posts. This command is the only way
 to add the sample blog content.
 
+### Top marquee
+
+A scrolling bar is fixed at the top of every page. By default it shows "Have a
+project or an idea in mind? Let's talk." with a "Contact me" link to `/contact`.
+To change it, open `/admin` → Site Settings → Top marquee and set a message, an
+optional link label and link URL, or untick "Show marquee" to hide it. If the
+message is empty the default is used. The seed does not touch these fields, so
+re-running it never overwrites marquee edits. The columns come from the
+`20261115_120000_site_announcement` migration.
+
 ## Everyday commands
 
 | Purpose | Command |

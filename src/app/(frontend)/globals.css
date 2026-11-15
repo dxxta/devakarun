@@ -156,7 +156,30 @@
   }
 }
 
+@keyframes site-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.site-marquee-track {
+  animation: site-marquee 40s linear infinite;
+}
+
+.site-marquee:hover .site-marquee-track {
+  animation-play-state: paused;
+}
+
+/* Keep the pill header below the fixed marquee. */
+body:has(.site-marquee) .site-nav-sticky {
+  top: 3.25rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .site-marquee-track {
+    animation: none;
+  }
+
   *,
   *::before,
   *::after {
