@@ -6,6 +6,8 @@ import { z } from 'zod'
 import config from '@/payload.config'
 import { sendContactNotice } from '@/lib/email'
 import { rateLimit } from '@/lib/rate-limit'
+import { hashIP } from '@/lib/visitor'
+import { recordRejectedContact } from '@/lib/contact-analytics'
 import { verifyTurnstile } from '@/lib/turnstile'
 
 const contactSchema = z.object({
@@ -28,15 +30,25 @@ async function clientIP(): Promise<string> {
 
 export async function submitContactMessage(input: unknown): Promise<{ success: boolean; message: string }> {
   const parsed = contactSchema.safeParse(input)
-  if (!parsed.success) return { success: false, message: 'Check the form fields and try again.' }
-  if (parsed.data.website?.trim()) return { success: false, message: 'Unable to send your message.' }
+  if (!parsed.success) {
+    await recordRejectedContact('validation_failed')
+    return { success: false, message: 'Check the form fields and try again.' }
+  }
+  if (parsed.data.website?.trim()) {
+    await recordRejectedContact('honeypot')
+    return { success: false, message: 'Unable to send your message.' }
+  }
 
   const ip = await clientIP()
   if (!await verifyTurnstile(parsed.data.turnstileToken ?? null, ip)) {
+    await recordRejectedContact('captcha_failed')
     return { success: false, message: 'Security check failed. Please try again.' }
   }
-  const limit = rateLimit(`contact:${ip}`, 5, 60 * 60 * 1000)
-  if (!limit.ok) return { success: false, message: 'Too many messages. Please try again later.' }
+  const limit = rateLimit(`contact:${hashIP(ip)}`, 5, 60 * 60 * 1000)
+  if (!limit.ok) {
+    await recordRejectedContact('rate_limited')
+    return { success: false, message: 'Too many messages. Please try again later.' }
+  }
 
   const payload = await getPayload({ config: await config })
   const { name, email, subject, message } = parsed.data

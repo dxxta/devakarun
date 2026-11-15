@@ -73,6 +73,7 @@ export interface Config {
     certificates: Certificate;
     projects: Project;
     'portfolio-showcases': PortfolioShowcase;
+    'gallery-images': GalleryImage;
     categories: Category;
     tags: Tag;
     posts: Post;
@@ -80,6 +81,10 @@ export interface Config {
     comments: Comment;
     'contact-messages': ContactMessage;
     subscribers: Subscriber;
+    'post-reactions': PostReaction;
+    'post-views': PostView;
+    'page-visits': PageVisit;
+    'analytics-events': AnalyticsEvent;
     search: Search;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -94,6 +99,7 @@ export interface Config {
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'portfolio-showcases': PortfolioShowcasesSelect<false> | PortfolioShowcasesSelect<true>;
+    'gallery-images': GalleryImagesSelect<false> | GalleryImagesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
@@ -101,6 +107,10 @@ export interface Config {
     comments: CommentsSelect<false> | CommentsSelect<true>;
     'contact-messages': ContactMessagesSelect<false> | ContactMessagesSelect<true>;
     subscribers: SubscribersSelect<false> | SubscribersSelect<true>;
+    'post-reactions': PostReactionsSelect<false> | PostReactionsSelect<true>;
+    'post-views': PostViewsSelect<false> | PostViewsSelect<true>;
+    'page-visits': PageVisitsSelect<false> | PageVisitsSelect<true>;
+    'analytics-events': AnalyticsEventsSelect<false> | AnalyticsEventsSelect<true>;
     search: SearchSelect<false> | SearchSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -342,6 +352,22 @@ export interface PortfolioShowcase {
   createdAt: string;
 }
 /**
+ * Manage event and personal photos shown in the gallery.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-images".
+ */
+export interface GalleryImage {
+  id: number;
+  title: string;
+  image: number | Media;
+  caption?: string | null;
+  order?: number | null;
+  takenAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
@@ -387,6 +413,9 @@ export interface Post {
     };
     [k: string]: unknown;
   };
+  /**
+   * Used only for link previews (Open Graph / Twitter). If empty, the first image in the post is used, then the site icon.
+   */
   coverImage?: (number | null) | Media;
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
@@ -451,6 +480,69 @@ export interface Subscriber {
   status: 'pending' | 'confirmed' | 'unsubscribed';
   confirmToken?: string | null;
   unsubscribeToken?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Read-only list of anonymous post reactions.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-reactions".
+ */
+export interface PostReaction {
+  id: number;
+  post: number | Post;
+  type: 'like' | 'love' | 'fire' | 'idea' | 'clap';
+  visitorHash: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Read-only list of deduplicated post views.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-views".
+ */
+export interface PostView {
+  id: number;
+  post: number | Post;
+  visitorHash: string;
+  day: string;
+  country: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Read-only anonymous page visit records.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-visits".
+ */
+export interface PageVisit {
+  id: number;
+  path: string;
+  country: string;
+  visitorHash: string;
+  day: string;
+  referrerHost?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Read-only first-party click and rejected-contact events.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analytics-events".
+ */
+export interface AnalyticsEvent {
+  id: number;
+  event: string;
+  path: string;
+  label?: string | null;
+  country: string;
+  visitorHash: string;
+  day: string;
+  reason?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -525,6 +617,10 @@ export interface PayloadLockedDocument {
         value: number | PortfolioShowcase;
       } | null)
     | ({
+        relationTo: 'gallery-images';
+        value: number | GalleryImage;
+      } | null)
+    | ({
         relationTo: 'categories';
         value: number | Category;
       } | null)
@@ -551,6 +647,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'subscribers';
         value: number | Subscriber;
+      } | null)
+    | ({
+        relationTo: 'post-reactions';
+        value: number | PostReaction;
+      } | null)
+    | ({
+        relationTo: 'post-views';
+        value: number | PostView;
+      } | null)
+    | ({
+        relationTo: 'page-visits';
+        value: number | PageVisit;
+      } | null)
+    | ({
+        relationTo: 'analytics-events';
+        value: number | AnalyticsEvent;
       } | null)
     | ({
         relationTo: 'search';
@@ -756,6 +868,19 @@ export interface PortfolioShowcasesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-images_select".
+ */
+export interface GalleryImagesSelect<T extends boolean = true> {
+  title?: T;
+  image?: T;
+  caption?: T;
+  order?: T;
+  takenAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
@@ -850,6 +975,57 @@ export interface SubscribersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-reactions_select".
+ */
+export interface PostReactionsSelect<T extends boolean = true> {
+  post?: T;
+  type?: T;
+  visitorHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-views_select".
+ */
+export interface PostViewsSelect<T extends boolean = true> {
+  post?: T;
+  visitorHash?: T;
+  day?: T;
+  country?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-visits_select".
+ */
+export interface PageVisitsSelect<T extends boolean = true> {
+  path?: T;
+  country?: T;
+  visitorHash?: T;
+  day?: T;
+  referrerHost?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analytics-events_select".
+ */
+export interface AnalyticsEventsSelect<T extends boolean = true> {
+  event?: T;
+  path?: T;
+  label?: T;
+  country?: T;
+  visitorHash?: T;
+  day?: T;
+  reason?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "search_select".
  */
 export interface SearchSelect<T extends boolean = true> {
@@ -919,6 +1095,19 @@ export interface SiteSetting {
      */
     linkUrl?: string | null;
   };
+  /**
+   * Turn parts of the public site on or off without a deploy.
+   */
+  features?: {
+    /**
+     * When off, hides CV and portfolio PDF download actions while keeping their surrounding sections and About dialog available.
+     */
+    showProfileDownload?: boolean | null;
+    /**
+     * When off, hides Gallery links and returns not found for the Gallery page.
+     */
+    showGallery?: boolean | null;
+  };
   siteTitle: string;
   description: string;
   socialLinks?:
@@ -957,10 +1146,14 @@ export interface Profile {
     [k: string]: unknown;
   };
   avatar?: (number | null) | Media;
+  /**
+   * Shown when visitors hover or tap the avatar card on the home page.
+   */
+  avatarAlt?: (number | null) | Media;
   resumeFile?: (number | null) | Media;
   portfolioPdf?: (number | null) | Media;
   /**
-   * Shows a mini image preview next to a bio list item whose text contains the keyword; images come from the gallery
+   * Shows a mini image preview next to a bio list item whose text contains the keyword. Images come from the gallery.
    */
   listPreviews?:
     | {
@@ -993,6 +1186,12 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         linkLabel?: T;
         linkUrl?: T;
       };
+  features?:
+    | T
+    | {
+        showProfileDownload?: T;
+        showGallery?: T;
+      };
   siteTitle?: T;
   description?: T;
   socialLinks?:
@@ -1015,6 +1214,7 @@ export interface ProfileSelect<T extends boolean = true> {
   headline?: T;
   bio?: T;
   avatar?: T;
+  avatarAlt?: T;
   resumeFile?: T;
   portfolioPdf?: T;
   listPreviews?:

@@ -124,6 +124,39 @@ Don't:
 
 Tabs, switches, menu items, sort headers and input add-ons only change colour.
 
+### Links and clickable text
+
+Every text link or clickable text shows a persistent underline, not only on hover: `underline decoration-2 underline-offset-4`, foreground colour. This applies to blog pages (post body links, table of contents, previous/next titles, comment links, card titles) and the footer. Buttons, pill badges used as labels and whole-card links keep their own style, but the title text inside a clickable card is a link and is underlined. Navigation is the one exception that uses state: the current page in the header (desktop) and the wordmark on the home page keep a permanent 2px underline, other items underline on hover; in the mobile menu the current page has a lime background.
+
+### Header and navigation
+
+- Pill header, sticky, sits under the top marquee (`.site-nav-sticky`, `top: 3.25rem` when the marquee exists). It narrows when scrolled.
+- Header icon buttons (search, theme, menu) are fully rounded (`data-shape="round"`); every other icon button uses the rounded square (`--radius-control`).
+- The mobile menu closes on navigation and marks the current page.
+- **Top marquee:** a lime bar fixed above everything, 2px black bottom border, ink text, scrolling text that pauses on hover and is static under reduced motion. The default alternates a contact prompt ("Contact me", `/contact`) and a cookie note ("Cookie details", `/cookies`). A custom message in Site Settings replaces the default.
+
+### Blog pages
+
+- **Width:** same `max-w-6xl` container as every other page. Two columns from `lg`: sticky left sidebar (about 16 to 18rem) and the article.
+- **Sidebar:** table of contents on top, previous/next suggestion cards below, `gap-6` between them. It is sticky below the marquee and header with a visible gap (about 1.5rem), scrolls inside itself when long, and has padding so card shadows are never clipped. It ends at the divider above the comments and never overlaps them.
+- **Table of contents:** built from h2 and h3 headings only; hidden when the post has none. The current section has a lime background. On mobile it is a collapsed block that stays sticky under the header while scrolling and closes after a tap.
+- **Post header:** category badges (multiple allowed), title, description and date/read-time/views line with generous vertical gaps, then a divider before the first heading.
+- **Body:** consistent block spacing, headings with `scroll-mt`, lists with `space-y-2`, code blocks highlighted on the server (shiki, light and dark themes) in a card with a language label and optional Copy button.
+- **Images:** every image in a post is previewable (click opens the lightbox with caption). The cover image is not shown on the site; it is only used for link previews (Open Graph and Twitter). If a post has no cover, the first image in the post is used, then the site icon.
+- **Blog list cards:** no cover image; badges, title, excerpt and date.
+- **Reactions and views:** a row of quiet pressable buttons (emoji plus count) open to guests, below the article; the view count sits in the meta line. See `docs/development.md` for how spam is handled.
+- **Comments:** a full-width band below the article, divided by a line. The "Comments" heading and "N approved comments" sit above one full-width card with "Join the conversation", the sign-in button inside it, then the form and list.
+- **AMP:** `/blog/<slug>/amp` is a plain AMP rendition for blog posts only; it keeps simple code blocks and no custom JavaScript.
+- **Mobile:** the project detail gallery scrolls horizontally with snapping.
+
+### Content cards
+
+- Certificate cards are dense: title at the top, issuer and issued/expiry lines pushed to the bottom so rows align, no reserved empty space.
+
+### Cookies page
+
+`/cookies` explains what the site stores (essential cookies and browser storage only, no ads or trackers). It is linked from the footer and the marquee, not from the main navigation.
+
 ### Styled and unstyled
 
 `<html data-style="unstyled">` keeps colours and fonts but uses 1px borders, small radii, no hard shadows and `--press-x/y: 0`. Styled is the default. There is no UI toggle yet.

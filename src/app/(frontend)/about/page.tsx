@@ -7,21 +7,24 @@ import { PortfolioShowcaseSection } from '@/components/portfolio/portfolio-showc
 import { ProjectsGrid } from '@/components/portfolio/projects-grid'
 import { TechStackSection } from '@/components/portfolio/tech-stack-section'
 import { LoadingState } from '@/components/states/loading-state'
+import { getSiteFeatures } from '@/lib/site-features'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'About' }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { showProfileDownload } = await getSiteFeatures()
+
   return (
     <div className="grid gap-14">
       <Suspense fallback={<LoadingState label="Loading profile…" variant="text" />}>
-        <ProfileSection />
+        <ProfileSection showProfileDownload={showProfileDownload} />
       </Suspense>
       <Suspense fallback={<LoadingState label="Loading certificates…" variant="list" />}>
         <CertificatesSection />
       </Suspense>
       <Suspense fallback={<LoadingState label="Loading portfolio showcase…" variant="cards" />}>
-        <PortfolioShowcaseSection />
+        <PortfolioShowcaseSection showProfileDownload={showProfileDownload} />
       </Suspense>
       <Suspense fallback={<LoadingState label="Loading projects…" variant="cards" />}>
         <ProjectsGrid />

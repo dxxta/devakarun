@@ -6,7 +6,7 @@ import { ProfileIntro } from '@/components/portfolio/profile-intro'
 import config from '@payload-config'
 import type { Profile } from '@/payload-types'
 
-export async function ProfileHero() {
+export async function ProfileHero({ showProfileDownload = true }: { showProfileDownload?: boolean }) {
   let profile: Profile | undefined
   let hasError = false
 
@@ -33,7 +33,8 @@ export async function ProfileHero() {
   return (
     <ProfileIntro
       profile={profile}
-      actions={<ProfileActions contactLinks={profile.contactLinks} />}
+      interactiveAvatar
+      actions={<ProfileActions contactLinks={profile.contactLinks} showProfileDownload={showProfileDownload} />}
     />
   )
 }

@@ -16,7 +16,8 @@ export type GalleryImage = {
   width: number
   height: number
   title: string
-  kind: 'project' | 'certificate' | 'showcase'
+  caption?: string | null
+  kind: 'project' | 'certificate' | 'event' | 'showcase'
   href?: string
   external?: boolean
 }
@@ -71,13 +72,13 @@ export function GalleryLightbox({
           {images.map((image, index) => (
             <DialogPrimitive.Trigger asChild key={image.id} onClick={() => setActiveIndex(index)}>
               <button
-                aria-label={`View ${image.title} screenshot`}
+                aria-label={`View ${image.title} ${image.kind === 'event' ? 'photo' : 'screenshot'}`}
                 className="group relative aspect-[4/3] min-w-0 overflow-hidden rounded-card border-2 border-border bg-muted text-left focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
                 data-pressable="card"
                 type="button"
               >
                 <Image
-                  alt={`${image.title} screenshot`}
+                  alt={`${image.title} ${image.kind === 'event' ? 'photo' : 'screenshot'}`}
                   className={`pointer-events-none h-full w-full ${image.kind === 'certificate' || image.kind === 'showcase' ? 'object-contain' : 'object-cover'}`}
                   height={image.height}
                   loading="lazy"
@@ -88,6 +89,9 @@ export function GalleryLightbox({
                 />
                 {image.kind === 'certificate' ? (
                   <Badge className="pointer-events-none absolute top-3 left-3" variant="secondary">Certificate</Badge>
+                ) : null}
+                {image.kind === 'event' ? (
+                  <Badge className="pointer-events-none absolute top-3 left-3" variant="secondary">Event</Badge>
                 ) : null}
               </button>
             </DialogPrimitive.Trigger>
@@ -123,7 +127,7 @@ export function GalleryLightbox({
                   <IconChevronLeft aria-hidden="true" />
                 </Button>
                 <Image
-                alt={activeImage.kind === 'showcase' ? `${activeImage.title} portfolio page` : `${activeImage.title} screenshot`}
+                  alt={activeImage.kind === 'showcase' ? `${activeImage.title} portfolio page` : `${activeImage.title} ${activeImage.kind === 'event' ? 'photo' : 'screenshot'}`}
                   className="max-h-[85vh] min-h-0 max-w-[calc(100%-5rem)] object-contain"
                   height={activeImage.height}
                   onError={(event) => { event.currentTarget.style.display = 'none' }}
@@ -136,17 +140,20 @@ export function GalleryLightbox({
                   <IconChevronRight aria-hidden="true" />
                 </Button>
               </div>
-              {activeImage.kind === 'showcase' ? (
-                <span className="font-display font-bold">{activeImage.title}</span>
-              ) : activeImage.external && activeImage.href ? (
-                <a className="font-display font-bold underline underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink" href={activeImage.href} rel="noopener noreferrer" target="_blank">
-                  {activeImage.title}
-                </a>
-              ) : activeImage.href ? (
-                <Link className="font-display font-bold underline underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink" href={activeImage.href}>
-                  {activeImage.title}
-                </Link>
-              ) : null}
+              <div className="text-center">
+                {activeImage.kind === 'showcase' ? (
+                  <span className="font-display font-bold">{activeImage.title}</span>
+                ) : activeImage.external && activeImage.href ? (
+                  <a className="font-display font-bold underline underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink" href={activeImage.href} rel="noopener noreferrer" target="_blank">
+                    {activeImage.title}
+                  </a>
+                ) : activeImage.href ? (
+                  <Link className="font-display font-bold underline underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink" href={activeImage.href}>
+                    {activeImage.title}
+                  </Link>
+                ) : <span className="font-display font-bold">{activeImage.title}</span>}
+                {activeImage.caption ? <p className="mb-0 mt-1 text-sm text-muted-foreground">{activeImage.caption}</p> : null}
+              </div>
             </>
           ) : null}
         </DialogPrimitive.Content>

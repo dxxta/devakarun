@@ -35,7 +35,14 @@ export const Posts: CollectionConfig = {
     { name: 'slug', type: 'text', required: true, unique: true, index: true },
     { name: 'excerpt', type: 'textarea', required: true, maxLength: 320 },
     { name: 'content', type: 'richText', required: true },
-    { name: 'coverImage', type: 'upload', relationTo: 'media' },
+    {
+      name: 'coverImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Used only for link previews (Open Graph / Twitter). If empty, the first image in the post is used, then the site icon.',
+      },
+    },
     { name: 'categories', type: 'relationship', relationTo: 'categories', hasMany: true },
     { name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true },
     { name: 'publishedAt', type: 'date', admin: { date: { pickerAppearance: 'dayAndTime' } } },

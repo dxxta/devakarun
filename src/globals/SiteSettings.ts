@@ -35,6 +35,30 @@ export const SiteSettings: GlobalConfig = {
       ],
     },
     {
+      name: 'features',
+      type: 'group',
+      label: 'Feature flags',
+      admin: {
+        description: 'Turn parts of the public site on or off without a deploy.',
+      },
+      fields: [
+        {
+          name: 'showProfileDownload',
+          type: 'checkbox',
+          defaultValue: true,
+          label: 'Show profile download button',
+          admin: { description: 'When off, hides CV and portfolio PDF download actions while keeping their surrounding sections and About dialog available.' },
+        },
+        {
+          name: 'showGallery',
+          type: 'checkbox',
+          defaultValue: true,
+          label: 'Show Gallery menu',
+          admin: { description: 'When off, hides Gallery links and returns not found for the Gallery page.' },
+        },
+      ],
+    },
+    {
       name: 'siteTitle',
       type: 'text',
       required: true,

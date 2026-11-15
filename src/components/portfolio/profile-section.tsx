@@ -15,7 +15,7 @@ import config from '@payload-config'
 import { splitBio } from '@/lib/bio'
 import type { Profile } from '@/payload-types'
 
-export async function ProfileSection() {
+export async function ProfileSection({ showProfileDownload = true }: { showProfileDownload?: boolean }) {
   let profile: Profile | undefined
   let hasError = false
 
@@ -45,8 +45,9 @@ export async function ProfileSection() {
     <div className="grid gap-10">
       <ProfileIntro
         compact
+        interactiveAvatar
         profile={profile}
-        actions={<ProfileActions contactLinks={profile.contactLinks} />}
+        actions={<ProfileActions contactLinks={profile.contactLinks} showProfileDownload={showProfileDownload} />}
       />
 
       {sections.length ? (

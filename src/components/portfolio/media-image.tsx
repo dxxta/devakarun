@@ -46,7 +46,7 @@ export function MediaImage({
         height={media.height ?? 800}
         sizes={sizes}
         priority={priority}
-        className={cn('h-full w-full object-cover', imageClassName)}
+        className={cn('h-full w-full object-cover object-center', imageClassName)}
       />
     </figure>
   )

@@ -57,6 +57,7 @@ for the three linked resume projects. `SEED_CONTENT=false` disables this
 first-boot seed.
 Afterward, make content changes in `/admin`; existing content is not overwritten
 on later boots. Blog sample content remains manual only.
+The home Profile global can set an optional `avatarAlt` photo that appears with a brief glitch on hover, keyboard focus, or tap.
 
 To intentionally reapply the portfolio seed after editing the seed source, run
 the manual upsert:
@@ -66,20 +67,105 @@ pnpm payload run src/seed/run.ts
 ```
 
 The portfolio seed is idempotent and upserts the profile, technologies,
-certificates, projects, showcase pages, and portfolio PDF. Run the GitHub sync
+certificates, projects, showcase pages, event gallery images, and portfolio PDF. Run the GitHub sync
 endpoint to refresh repository data after a manual seed. Blog content has a separate manual seed:
 
 ```bash
 pnpm payload run src/seed/run-blog.ts
 ```
 
-It creates the starter categories, tags, and posts. This command is the only way
-to add the sample blog content.
+It creates the starter categories, tags, and posts. Current seed posts are the
+private search-quality draft, the Cloudflare DNS article, the DevFest Jakarta
+recap, and a published layout-check post. The three earlier writing, content
+model, and server-components samples are removed when this seed runs.
+
+Blog post table of contents links are generated from `h2` and `h3` headings and
+are hidden when a post has none. Published posts can also show previous and next
+post suggestions. Each published post has an AMP version at `/blog/<slug>/amp`,
+with a canonical link back to the regular post page. Blog post images open in a
+preview modal. The blog list is paginated at six posts per page. Comments use a full-width section below the article, with the
+count above a card for joining the conversation and approved comments listed
+below it.
+
+Blog posts and project pages include a Share menu with copy-link, the device
+share sheet when available, and plain intent links for X, LinkedIn, Facebook,
+WhatsApp, Telegram, and email. These links load no third-party SDKs and set no
+extra cookies; a network opens only after the visitor clicks its link. Share
+actions use the `share_copy`, `share_native`, `share_x`, `share_linkedin`,
+`share_facebook`, `share_whatsapp`, `share_telegram`, and `share_email`
+analytics events, labeled `post:<slug>` or `project:<slug>`. To add a network,
+add its encoded intent URL and Tabler icon in `src/components/share-button.tsx`
+and add its event name to `src/lib/analytics.ts`.
+
+Blog code blocks are highlighted on the server with Shiki. Supported languages
+are TypeScript (`ts`/`tsx`), JavaScript (`js`/`jsx`), JSON, Bash (`bash`, `sh`,
+`shell`, `zsh`), CSS, HTML, SQL, YAML, diff, Markdown, HTTP, Dockerfile, and
+plain text. In the editor, code is a Code block with a language selector and is
+rendered with Shiki. Add another language to the allowlist and singleton highlighter in
+`src/components/blog/code-block.tsx` when needed.
+
+Post cover images are used only for link previews (Open Graph and Twitter). If a
+post has no cover image, its first body image is used; posts without images use
+the site icon. The Cloudflare dashboard setup screenshots are excluded so the
+article continues to use its Slipakar image. The AMP page also includes the
+resolved social image as metadata, while its visible content comes from the
+post body.
+
+### Analytics
+
+The admin-only analytics dashboard is the first page after admin login and is
+also available from the sidebar. Summary cards, sparklines, the visits chart,
+top lists, and the small country map show the last 7 days. Each card links to a
+detail page with 7, 30, or 90 day ranges; country details include the world map.
+Charts use Recharts and the map uses d3-geo, TopoJSON, world-atlas, and
+i18n-iso-countries. Country is read from `CF-IPCountry` when the Cloudflare
+proxy supplies it, and is shown as unknown during local development.
+The dashboard and detail pages can export a watermarked PNG, share it where supported, or copy it to the clipboard.
+
+The site stores visitor and IP hashes, country codes, paths, event names, and
+short labels or reason codes; it does not store raw IP addresses or user agents.
+Add click tracking by placing an allowed `data-track` event and optional
+`data-track-label` on an important link or button. Prune records older than 90
+days manually with `pnpm payload run src/seed/prune-analytics.ts`.
+
+### Reactions and views
+
+Guests can react without signing in. The site uses a one-year anonymous visitor
+cookie and stores only salted hashes of that ID and the IP hash, which rotates
+daily; it does not store raw IP addresses or user agents. Reactions are limited
+to 30 writes per IP hash per hour and 10 per visitor per minute. Views are
+counted by a client beacon after the page has been visible for 8 seconds and the
+visitor interacts, at most once per visitor per post per UTC day. Same-origin
+checks, a bot user-agent filter, and per-IP limits (60 inserts per hour and 20
+distinct posts per day) reduce spam; admin sessions and preview views are
+ignored. Counts are stored in the `post-reactions` and `post-views` collections
+under Engagement. Old view rows can be pruned when needed.
+
+### Gallery images
+
+The gallery combines certificate images, project screenshots, and event photos.
+Manage free-standing event images in `/admin` under Gallery Images. The portfolio
+seed uses the files in `seed-assets/gallery/`; run `pnpm payload run
+src/seed/run-gallery.ts` to upsert only those gallery records without reseeding
+profile or project content. Gallery photo uploads reference the Media collection.
+The public gallery is paginated at 12 images per page.
+
+### Feature flags
+
+In `/admin` → Site Settings → Feature flags, the owner can hide profile CV and
+portfolio PDF download actions or hide Gallery links from the header, mobile
+menu, footer, and sitemap. Both flags default to on, and `/gallery` returns a
+404 while its flag is off. Missing settings or a failed settings read keep both
+features enabled. Hiding profile downloads removes only the CV and portfolio
+PDF controls; the About dialog, its OK button, and the About me action remain.
 
 ### Top marquee
 
-A scrolling bar is fixed at the top of every page. By default it shows "Have a
-project or an idea in mind? Let's talk." with a "Contact me" link to `/contact`.
+A scrolling bar is fixed at the top of every page. By default it alternates
+"Have a project or an idea in mind? Let's talk." with a "Contact me" link to
+`/contact`, and "Only essential cookies here, no ads or trackers." with a
+"Cookie details" link to `/cookies`. The Cookies page explains the site's
+first-party cookies and browser storage.
 To change it, open `/admin` → Site Settings → Top marquee and set a message, an
 optional link label and link URL, or untick "Show marquee" to hide it. If the
 message is empty the default is used. The seed does not touch these fields, so

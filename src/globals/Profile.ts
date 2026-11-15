@@ -34,6 +34,15 @@ export const Profile: GlobalConfig = {
       relationTo: 'media',
     },
     {
+      name: 'avatarAlt',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Hover avatar',
+      admin: {
+        description: 'Shown when visitors hover or tap the avatar card on the home page.',
+      },
+    },
+    {
       name: 'resumeFile',
       type: 'upload',
       relationTo: 'media',
@@ -49,7 +58,7 @@ export const Profile: GlobalConfig = {
       type: 'array',
       label: 'Bio previews',
       admin: {
-        description: 'Shows a mini image preview next to a bio list item whose text contains the keyword; images come from the gallery',
+        description: 'Shows a mini image preview next to a bio list item whose text contains the keyword. Images come from the gallery.',
       },
       fields: [
         { name: 'keyword', type: 'text', required: true },

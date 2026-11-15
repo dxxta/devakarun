@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { MediaImage } from '@/components/portfolio/media-image'
 import { getGithubUrl } from '@/components/portfolio/project-card'
 import { Card, CardContent } from '@/components/ui/card'
+import { ShareButton } from '@/components/share-button'
+import { absoluteURL } from '@/lib/seo'
 import type { Project } from '@/payload-types'
 
 function hasDescriptionText(description: Project['description']): boolean {
@@ -34,7 +36,7 @@ export function ProjectDetail({ project }: { project: Project }) {
   const hasArchitecture = Boolean(architectureSummary || architectureItems.length || architectureDiagram)
 
   return (
-    <article className="mx-auto grid max-w-4xl gap-8">
+    <article className="grid gap-8">
       <header className="grid gap-5">
         <h1 className="m-0 text-balance font-display text-4xl font-extrabold tracking-tight sm:text-6xl">
           {project.title}
@@ -43,8 +45,9 @@ export function ProjectDetail({ project }: { project: Project }) {
           {project.summary}
         </p>
         <div className="flex flex-wrap gap-3">
-          {githubUrl ? <Button asChild><a href={githubUrl} rel="noopener noreferrer" target="_blank"><IconBrandGithub aria-hidden="true" />View on GitHub</a></Button> : null}
-          {project.liveUrl ? <Button asChild variant="quiet"><a href={project.liveUrl} rel="noreferrer" target="_blank"><IconExternalLink aria-hidden="true" />Live site</a></Button> : null}
+          {githubUrl ? <Button asChild><a data-track="project_github" data-track-label={project.slug} href={githubUrl} rel="noopener noreferrer" target="_blank"><IconBrandGithub aria-hidden="true" />View on GitHub</a></Button> : null}
+          {project.liveUrl ? <Button asChild variant="quiet"><a data-track="project_live" data-track-label={project.slug} href={project.liveUrl} rel="noreferrer" target="_blank"><IconExternalLink aria-hidden="true" />Live site</a></Button> : null}
+          <ShareButton kind="project" title={project.title} url={absoluteURL(`/projects/${encodeURIComponent(project.slug)}`)} />
         </div>
         <ul aria-label="Project details" className="m-0 flex list-none flex-wrap gap-2 p-0">
           {language ? <li><Badge variant="outline">{language}</Badge></li> : null}

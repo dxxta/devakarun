@@ -22,5 +22,7 @@ export function extractText(value: unknown): string {
   const record = value as Record<string, unknown>
   const ownText = typeof record.text === 'string' ? record.text : ''
   const childText = extractText(record.children)
-  return [ownText, childText].filter(Boolean).join(' ')
+  const fields = typeof record.fields === 'object' && record.fields !== null ? record.fields as Record<string, unknown> : {}
+  const blockText = record.type === 'block' && fields.blockType === 'code' && typeof fields.code === 'string' ? fields.code : ''
+  return [ownText, childText, blockText].filter(Boolean).join(' ')
 }

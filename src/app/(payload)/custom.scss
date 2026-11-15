@@ -1,0 +1,19 @@
+.analytics-summary-strip {
+  scrollbar-color: var(--theme-elevation-400) var(--theme-elevation-100);
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--theme-elevation-100);
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--theme-elevation-400);
+    border: 2px solid var(--theme-elevation-100);
+    border-radius: 999px;
+  }
+}

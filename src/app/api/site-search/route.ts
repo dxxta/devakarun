@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { rateLimit } from '@/lib/rate-limit'
+import { hashIP } from '@/lib/visitor'
 import type { Search } from '@/payload-types'
 
 export const dynamic = 'force-dynamic'
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
   const ip = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
     || requestHeaders.get('x-real-ip')
     || 'unknown'
-  const rate = rateLimit(`site-search:${ip}`, RATE_LIMIT, RATE_WINDOW_MS)
+  const rate = rateLimit(`site-search:${hashIP(ip)}`, RATE_LIMIT, RATE_WINDOW_MS)
 
   if (!rate.ok) {
     return Response.json({ results: [] }, {

@@ -17,10 +17,11 @@ const links = [
   { href: '/contact', label: 'Contact' },
 ]
 
-export function SiteHeader() {
+export function SiteHeader({ showGallery = true }: { showGallery?: boolean }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const pathname = usePathname()
+  const visibleLinks = showGallery ? links : links.filter(({ href }) => href !== '/gallery')
   const [containerWidths, setContainerWidths] = useState<{ wide: number; narrow: number } | null>(null)
   const headerContainerRef = useRef<HTMLDivElement>(null)
 
@@ -98,7 +99,7 @@ export function SiteHeader() {
       </Link>
 
       <nav aria-label="Main navigation" className="hidden items-center gap-6 md:flex">
-        {links.map(({ href, label }) => (
+        {visibleLinks.map(({ href, label }) => (
           <Link
             aria-current={pathname === href || pathname.startsWith(`${href}/`) ? 'page' : undefined}
             className="font-medium underline-offset-4 decoration-2 hover:underline aria-[current=page]:underline"
@@ -135,7 +136,7 @@ export function SiteHeader() {
               <SheetTitle className="font-display text-2xl">Menu</SheetTitle>
             </SheetHeader>
             <nav aria-label="Mobile navigation" className="mt-6 grid gap-2">
-              {links.map(({ href, label }) => (
+              {visibleLinks.map(({ href, label }) => (
                 <Link
                   aria-current={pathname === href || pathname.startsWith(`${href}/`) ? 'page' : undefined}
                   className="rounded-control px-3 py-3 text-lg font-semibold hover:bg-muted aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground"

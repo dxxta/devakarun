@@ -13,9 +13,11 @@ import type { Profile } from '@/payload-types'
 export function ProfileActions({
   contactLinks,
   showAboutLink = true,
+  showProfileDownload = true,
 }: {
   contactLinks: Profile['contactLinks']
   showAboutLink?: boolean
+  showProfileDownload?: boolean
 }) {
   const primaryContact = contactLinks?.[0]
   const pathname = usePathname()
@@ -26,6 +28,7 @@ export function ProfileActions({
   const aboutLink = (
     <Button asChild variant="quiet">
       <Link
+        data-track="hero_about"
         href="/about"
         onClick={(event) => {
           if (!isAboutPage) return
@@ -45,7 +48,11 @@ export function ProfileActions({
     <div className="flex flex-wrap gap-3">
       {primaryContact ? (
         <Button asChild>
-          <a href={primaryContact.url}>
+          <a
+            data-track={primaryContact.label.toLowerCase() === 'github' ? 'hero_github' : 'contact_link'}
+            data-track-label={primaryContact.label.toLowerCase() === 'github' ? undefined : primaryContact.label.toLowerCase()}
+            href={primaryContact.url}
+          >
             {primaryContact.label === 'GitHub' ? (
               <IconBrandGithub aria-hidden="true" className="size-4" />
             ) : null}
@@ -70,18 +77,22 @@ export function ProfileActions({
                 You’re already on the About page. Take a look around!
               </DialogPrimitive.Description>
               <div className="flex flex-wrap justify-end gap-3">
+                {showProfileDownload ? (
+                  <>
                 <Button asChild variant="quiet">
-                  <a href="/cv/Mochammad-Dinta-Alif-Syaifuddin-CV.pdf" download>
+                  <a data-track="cv_download" data-track-label="pdf" href="/cv/Mochammad-Dinta-Alif-Syaifuddin-CV.pdf" download>
                     <IconDownload aria-hidden="true" className="size-4" />
                     CV (PDF)
                   </a>
                 </Button>
                 <Button asChild variant="quiet">
-                  <a href="/cv/Mochammad-Dinta-Alif-Syaifuddin-CV-ATS.docx" download>
+                  <a data-track="cv_download" data-track-label="docx" href="/cv/Mochammad-Dinta-Alif-Syaifuddin-CV-ATS.docx" download>
                     <IconDownload aria-hidden="true" className="size-4" />
                     ATS CV (DOCX)
                   </a>
                 </Button>
+                  </>
+                ) : null}
                 <DialogPrimitive.Close asChild>
                   <Button type="button">OK</Button>
                 </DialogPrimitive.Close>

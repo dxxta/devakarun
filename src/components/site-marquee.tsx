@@ -2,9 +2,10 @@ import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-const DEFAULT_MESSAGE = 'Have a project or an idea in mind? Let’s talk.'
-const DEFAULT_LINK_LABEL = 'Contact me'
-const DEFAULT_LINK_URL = '/contact'
+const DEFAULT_MESSAGES = [
+  { text: 'Have a project or an idea in mind? Let’s talk.', label: 'Contact me', href: '/contact', event: 'marquee_contact' },
+  { text: 'Only essential cookies here, no ads or trackers.', label: 'Cookie details', href: '/cookies', event: 'marquee_cookies' },
+]
 
 export async function SiteMarquee() {
   let enabled = true
@@ -27,28 +28,34 @@ export async function SiteMarquee() {
   if (!enabled) return null
 
   const useDefault = !message
-  const text = useDefault ? DEFAULT_MESSAGE : message
-  const label = useDefault ? DEFAULT_LINK_LABEL : linkLabel
-  const href = useDefault ? DEFAULT_LINK_URL : linkUrl || (linkLabel ? DEFAULT_LINK_URL : '')
-  const external = /^https?:\/\//.test(href)
+  const messages = useDefault
+    ? DEFAULT_MESSAGES
+    : [{ text: message, label: linkLabel, href: linkUrl || (linkLabel ? '/contact' : ''), event: undefined }]
 
-  const item = (key: number) => (
-    <span aria-hidden={key > 0 ? 'true' : undefined} className="flex shrink-0 items-center gap-3 px-6" key={key}>
-      <span>{text}</span>
-      {href && label ? (
+  const item = (key: number) => {
+    const current = messages[key % messages.length]
+    if (!current) return null
+    const duplicate = key >= messages.length
+    const external = /^https?:\/\//.test(current.href)
+    return (
+      <span aria-hidden={duplicate ? 'true' : undefined} className="flex shrink-0 items-center gap-3 px-6" key={key}>
+      <span>{current.text}</span>
+      {current.href && current.label ? (
         <Link
           className="underline decoration-2 underline-offset-4"
-          href={href}
+          data-track={current.event}
+          href={current.href}
           rel={external ? 'noreferrer' : undefined}
-          tabIndex={key > 0 ? -1 : undefined}
+          tabIndex={duplicate ? -1 : undefined}
           target={external ? '_blank' : undefined}
         >
-          {label}
+          {current.label}
         </Link>
       ) : null}
       <span aria-hidden="true">✦</span>
-    </span>
-  )
+      </span>
+    )
+  }
 
   return (
     <div
@@ -57,7 +64,7 @@ export async function SiteMarquee() {
       role="region"
     >
       <div className="site-marquee-track flex w-max py-2 font-display text-sm font-bold whitespace-nowrap">
-        {Array.from({ length: 12 }, (_, index) => item(index))}
+        {Array.from({ length: messages.length * 6 }, (_, index) => item(index))}
       </div>
     </div>
   )

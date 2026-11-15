@@ -1,0 +1,77 @@
+import { createHash, randomBytes } from 'node:crypto'
+
+const oneYear = 60 * 60 * 24 * 365
+
+export type VisitorIdentity = {
+  visitorHash: string
+  ipHash: string
+  day: string
+  setCookie?: string
+}
+
+function sha256(value: string): string {
+  return createHash('sha256').update(value).digest('hex')
+}
+
+export function hashIP(ip: string, day = new Date().toISOString().slice(0, 10)): string {
+  const salt = process.env.PAYLOAD_SECRET
+  if (!salt) throw new Error('PAYLOAD_SECRET must be configured to create IP hashes.')
+  return sha256(`${salt}:ip:${ip}:${day}`)
+}
+
+function readCookie(request: Request, name: string): string | undefined {
+  const cookies = request.headers.get('cookie')
+  if (!cookies) return undefined
+  for (const part of cookies.split(';')) {
+    const [key, ...value] = part.trim().split('=')
+    if (key === name) return value.join('=')
+  }
+  return undefined
+}
+
+export function getVisitor(request: Request): VisitorIdentity {
+  const salt = process.env.PAYLOAD_SECRET
+  if (!salt) throw new Error('PAYLOAD_SECRET must be configured to create visitor hashes.')
+
+  const savedID = readCookie(request, 'vid')
+  const visitorID = savedID && /^[a-f0-9]{32}$/i.test(savedID) ? savedID : randomBytes(16).toString('hex')
+  const now = new Date()
+  const day = now.toISOString().slice(0, 10)
+  const ip = request.headers.get('x-real-ip')?.trim()
+    || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || 'unknown'
+
+  return {
+    visitorHash: sha256(`${salt}:visitor:${visitorID}`),
+    ipHash: hashIP(ip, day),
+    day,
+    ...(!savedID || !/^[a-f0-9]{32}$/i.test(savedID) ? {
+      setCookie: `vid=${visitorID}; Max-Age=${oneYear}; Path=/; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`,
+    } : {}),
+  }
+}
+
+export function isSameOriginRequest(request: Request): boolean {
+  const origin = request.headers.get('origin')
+  const fetchSite = request.headers.get('sec-fetch-site')?.toLowerCase()
+  if (fetchSite && fetchSite !== 'same-origin') return false
+  const expectedOrigin = new URL(request.url).origin
+  if (origin) {
+    try {
+      return new URL(origin).origin === expectedOrigin
+    } catch {
+      return false
+    }
+  }
+  return fetchSite === 'same-origin'
+}
+
+export function noStoreJSON(
+  data: unknown,
+  status = 200,
+  setCookie?: string,
+): Response {
+  const headers = new Headers({ 'Cache-Control': 'no-store' })
+  if (setCookie) headers.set('Set-Cookie', setCookie)
+  return Response.json(data, { status, headers })
+}

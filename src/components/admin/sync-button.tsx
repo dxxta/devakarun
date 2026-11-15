@@ -19,7 +19,7 @@ export function SyncButton() {
       })
       const result = await response.json() as { synced?: number; failed?: number; error?: string }
       if (!response.ok) throw new Error(result.error ?? 'GitHub sync failed.')
-      if (result.failed) toast.error(`Synced ${result.synced ?? 0}; ${result.failed} failed.`)
+      if (result.failed) toast.error(`Synced ${result.synced ?? 0}. ${result.failed} failed.`)
       else toast.success('Project synced from GitHub.')
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'GitHub sync failed.')

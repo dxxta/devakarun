@@ -2,6 +2,9 @@ export function AdminLogo() {
   return (
     <span
       style={{
+        display: 'inline-flex',
+        maxWidth: '100%',
+        overflow: 'visible',
         fontFamily: 'var(--font-display, inherit)',
         fontSize: '2rem',
         fontWeight: 800,

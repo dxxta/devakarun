@@ -1,4 +1,163 @@
 @import 'tailwindcss';
+
+.shiki {
+  background-color: transparent !important;
+}
+
+.shiki span {
+  color: var(--shiki-light);
+}
+
+.dark .shiki span {
+  color: var(--shiki-dark);
+}
+
+.link-underline {
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.post-body a {
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.profile-intro-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) 6rem;
+  grid-template-areas:
+    'title avatar'
+    'bio bio'
+    'actions actions';
+  align-items: center;
+  column-gap: 1.5rem;
+  row-gap: 1.25rem;
+}
+
+.profile-intro-grid__avatar {
+  grid-area: avatar;
+  min-width: 0;
+  justify-self: end;
+  align-self: center;
+}
+
+@media (min-width: 48rem) {
+  .profile-intro-grid {
+    grid-template-columns: minmax(0, 1fr) 16rem;
+    grid-template-areas:
+      'title avatar'
+      'bio avatar'
+      'actions avatar';
+    column-gap: 3rem;
+  }
+
+  .profile-intro-grid--compact {
+    grid-template-columns: minmax(0, 1fr) 10rem;
+  }
+}
+
+.glitch-card {
+  position: relative;
+  scale: none;
+  transition: none !important;
+  cursor: pointer;
+  outline: none;
+}
+
+.glitch-card:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 4px;
+}
+
+.glitch-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  scale: none;
+  transition: none !important;
+  border-radius: calc(var(--radius-card) - 2px);
+}
+
+.glitch-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  scale: none;
+  transition: none !important;
+}
+
+.glitch-layer--primary { opacity: 1; }
+.glitch-layer--secondary { opacity: 0; }
+.glitch-card[data-show-alt='true'] .glitch-layer--primary { opacity: 0; }
+.glitch-card[data-show-alt='true'] .glitch-layer--secondary { opacity: 1; }
+.glitch-card[data-glitching='true'] .glitch-layer { transition: none; }
+
+.glitch-canvas {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  transition: none !important;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+  scale: none;
+}
+
+.glitch-fallback {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.glitch-fallback-block {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: pixel-fallback-flash 900ms steps(8, end) both;
+}
+
+.glitch-fallback-block--lime-1,
+.glitch-fallback-block--lime-2,
+.glitch-fallback-block--lime-3,
+.glitch-fallback-block--lime-4,
+.glitch-fallback-block--lime-5,
+.glitch-fallback-block--lime-6,
+.glitch-fallback-block--lime-7 { background: #d4f03c; }
+.glitch-fallback-block--black-1,
+.glitch-fallback-block--black-2 { background: #000000; }
+.glitch-fallback-block--white { background: #ffffff; }
+
+.glitch-fallback-block--lime-1 { clip-path: inset(10% 64% 72% 8%); }
+.glitch-fallback-block--lime-2 { clip-path: inset(24% 12% 60% 68%); animation-delay: 35ms; }
+.glitch-fallback-block--lime-3 { clip-path: inset(42% 56% 40% 18%); animation-delay: 70ms; }
+.glitch-fallback-block--lime-4 { clip-path: inset(58% 10% 24% 70%); animation-delay: 105ms; }
+.glitch-fallback-block--lime-5 { clip-path: inset(72% 58% 8% 18%); animation-delay: 140ms; }
+.glitch-fallback-block--lime-6 { clip-path: inset(34% 28% 48% 42%); animation-delay: 175ms; }
+.glitch-fallback-block--lime-7 { clip-path: inset(82% 34% 4% 42%); animation-delay: 210ms; }
+.glitch-fallback-block--black-1 { clip-path: inset(16% 38% 66% 40%); animation-delay: 80ms; }
+.glitch-fallback-block--black-2 { clip-path: inset(64% 42% 18% 34%); animation-delay: 180ms; }
+.glitch-fallback-block--white { clip-path: inset(44% 12% 42% 80%); animation-delay: 120ms; }
+
+@keyframes pixel-fallback-flash {
+  0%, 100% { opacity: 0; transform: translateX(0); }
+  18%, 38% { opacity: 0.72; transform: translateX(3px); }
+  58% { opacity: 0.28; transform: translateX(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glitch-layer { transition-duration: 0ms; }
+  .glitch-fallback-block { animation: none !important; }
+}
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));

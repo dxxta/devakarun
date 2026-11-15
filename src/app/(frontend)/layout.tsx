@@ -9,6 +9,9 @@ import { fontDisplay, fontSans } from '@/lib/fonts'
 import { PressedProvider } from '@/components/pressed-provider'
 import { RouteProgress } from '@/components/route-progress'
 import { ScrollToTop } from '@/components/scroll-to-top'
+import { VisitTracker } from '@/components/analytics/visit-tracker'
+import { ClickTracker } from '@/components/analytics/click-tracker'
+import { getSiteFeatures } from '@/lib/site-features'
 import { Suspense } from 'react'
 import './globals.css'
 
@@ -25,7 +28,11 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export const dynamic = 'force-dynamic'
+
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const { showGallery } = await getSiteFeatures()
+
   return (
     <html lang="en" suppressHydrationWarning className={`${fontDisplay.variable} ${fontSans.variable}`}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
@@ -34,17 +41,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <RouteProgress />
           </Suspense>
           <ScrollToTop />
+          <VisitTracker />
+          <ClickTracker />
           <PressedProvider />
           <div className="flex min-h-screen w-full flex-col">
             <Suspense fallback={null}>
               <SiteMarquee />
             </Suspense>
             <div className="site-nav-sticky sticky top-3 z-40 mt-4 w-full">
-              <SiteHeader />
+              <SiteHeader showGallery={showGallery} />
             </div>
             <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
             <div className="mx-auto w-full max-w-6xl px-4">
-              <SiteFooter />
+              <SiteFooter showGallery={showGallery} />
             </div>
           </div>
           <Toaster position="top-right" />

@@ -63,6 +63,8 @@ export default async function ContactPage() {
                     <a
                       className="flex min-w-0 items-start gap-3 rounded-control p-2 text-primary-foreground underline decoration-primary-foreground/60 underline-offset-4 hover:bg-primary-foreground/10 focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
                       data-pressable="card"
+                      data-track={['github', 'linkedin'].includes(label.toLowerCase()) ? 'social_click' : 'contact_link'}
+                      data-track-label={label.toLowerCase()}
                       href={url}
                     >
                       <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ink-fixed text-primary-foreground">

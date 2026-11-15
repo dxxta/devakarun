@@ -21,6 +21,8 @@ export function ProjectCard({ project }: { project: Project }) {
         aria-label={`View ${project.title}`}
         className="group flex h-full min-w-0 rounded-card focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
         data-pressable="card"
+        data-track="project_open"
+        data-track-label={project.slug}
         href={`/projects/${project.slug}`}
       >
       <Card className="pointer-events-none h-full w-full gap-4 rounded-[calc(1.5rem-3px)] border-0 shadow-none">
@@ -57,10 +59,12 @@ export function ProjectCard({ project }: { project: Project }) {
           asChild
           aria-label="View repository on GitHub"
           className="absolute right-5 bottom-5 z-10 size-8 p-0"
+          data-track="project_github"
+          data-track-label={project.slug}
           size="icon"
           variant="quiet"
         >
-          <a href={githubUrl} rel="noopener noreferrer" target="_blank">
+          <a data-track="project_github" data-track-label={project.slug} href={githubUrl} rel="noopener noreferrer" target="_blank">
             <IconBrandGithub aria-hidden="true" className="size-4" />
           </a>
         </Button>

@@ -6,6 +6,11 @@ import * as migration_20261112_023016_project_preview_source from './20261112_02
 import * as migration_20261112_032259_profile_list_previews from './20261112_032259_profile_list_previews';
 import * as migration_20261112_041322_portfolio_showcases from './20261112_041322_portfolio_showcases';
 import * as migration_20261115_120000_site_announcement from './20261115_120000_site_announcement';
+import * as migration_20261115_140000_gallery_images from './20261115_140000_gallery_images';
+import * as migration_20261115_150000_post_reactions_views from './20261115_150000_post_reactions_views';
+import * as migration_20261115_160000_analytics from './20261115_160000_analytics';
+import * as migration_20261115_170000_profile_avatar_alt from './20261115_170000_profile_avatar_alt';
+import * as migration_20261115_180000_site_features from './20261115_180000_site_features';
 
 export const migrations = [
   {
@@ -47,5 +52,30 @@ export const migrations = [
     up: migration_20261115_120000_site_announcement.up,
     down: migration_20261115_120000_site_announcement.down,
     name: '20261115_120000_site_announcement',
+  },
+  {
+    up: migration_20261115_140000_gallery_images.up,
+    down: migration_20261115_140000_gallery_images.down,
+    name: '20261115_140000_gallery_images',
+  },
+  {
+    up: migration_20261115_150000_post_reactions_views.up,
+    down: migration_20261115_150000_post_reactions_views.down,
+    name: '20261115_150000_post_reactions_views',
+  },
+  {
+    up: migration_20261115_160000_analytics.up,
+    down: migration_20261115_160000_analytics.down,
+    name: '20261115_160000_analytics',
+  },
+  {
+    up: migration_20261115_170000_profile_avatar_alt.up,
+    down: migration_20261115_170000_profile_avatar_alt.down,
+    name: '20261115_170000_profile_avatar_alt',
+  },
+  {
+    up: migration_20261115_180000_site_features.up,
+    down: migration_20261115_180000_site_features.down,
+    name: '20261115_180000_site_features',
   },
 ];

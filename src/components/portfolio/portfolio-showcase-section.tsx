@@ -8,13 +8,13 @@ import { GalleryLightbox, type GalleryImage } from '@/components/portfolio/galle
 import { Button } from '@/components/ui/button'
 import type { Media, PortfolioShowcase, Profile } from '@/payload-types'
 
-type PortfolioShowcaseSectionProps = { featuredOnly?: boolean }
+type PortfolioShowcaseSectionProps = { featuredOnly?: boolean; showProfileDownload?: boolean }
 
 function isPopulatedMedia(value: unknown): value is Media & { url: string } {
   return typeof value === 'object' && value !== null && 'url' in value && typeof value.url === 'string' && value.url.trim().length > 0
 }
 
-export async function PortfolioShowcaseSection({ featuredOnly = false }: PortfolioShowcaseSectionProps) {
+export async function PortfolioShowcaseSection({ featuredOnly = false, showProfileDownload = true }: PortfolioShowcaseSectionProps) {
   let showcases: PortfolioShowcase[] = []
   let hasError = false
   let portfolioPdfUrl: string | undefined
@@ -86,7 +86,7 @@ export async function PortfolioShowcaseSection({ featuredOnly = false }: Portfol
     <section aria-labelledby={headingId} className="grid min-w-0 scroll-mt-28 gap-5" id={featuredOnly ? undefined : 'showcase'}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="m-0 scroll-mt-28 font-display text-2xl font-bold" id={headingId}>{heading}</h2>
-        {!featuredOnly && portfolioPdfUrl ? (
+        {!featuredOnly && showProfileDownload && portfolioPdfUrl ? (
           <Button asChild>
             <a download href={portfolioPdfUrl}>
               <IconDownload aria-hidden="true" className="size-4" />

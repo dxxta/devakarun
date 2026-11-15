@@ -1,6 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { searchPlugin } from '@payloadcms/plugin-search'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -17,6 +17,7 @@ import { createPayloadEmailAdapter } from './lib/email'
 import { logFeatureStatus } from './lib/feature-status'
 import { seedAdmin } from './seed/admin'
 import { seedContentIfEmpty } from './seed/bootstrap'
+import { CodeBlock } from './blocks/CodeBlock'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -30,18 +31,38 @@ export default buildConfig({
       openGraph: { siteName: 'dev.akarun' },
     },
     components: {
+      actions: ['/components/admin/theme-toggle-action'],
+      afterNavLinks: ['/components/admin/analytics-nav-link#AnalyticsNavLink'],
       graphics: {
         Logo: '/components/admin/admin-logo#AdminLogo',
         Icon: '/components/admin/admin-icon#AdminIcon',
       },
+      views: {
+        dashboard: {
+          Component: '/components/admin/analytics-view#AnalyticsDashboardView',
+        },
+        analytics: {
+          Component: '/components/admin/analytics-view#AnalyticsView',
+          path: '/analytics',
+          exact: true,
+        },
+        analyticsDetail: {
+          Component: '/components/admin/analytics-view#AnalyticsView',
+          path: '/analytics/:metric',
+          exact: true,
+        },
+      },
     },
+    theme: 'all',
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
   collections: [Users, Media, ...portfolioCollections, ...blogCollections, ...engagementCollections],
   globals: [...portfolioGlobals],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [CodeBlock] })],
+  }),
   secret: env.PAYLOAD_SECRET,
   email: createPayloadEmailAdapter(),
   typescript: {

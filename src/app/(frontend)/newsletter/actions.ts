@@ -8,6 +8,7 @@ import config from '@/payload.config'
 import { sendNewsletterConfirmation } from '@/lib/email'
 import { env } from '@/lib/env'
 import { rateLimit } from '@/lib/rate-limit'
+import { hashIP } from '@/lib/visitor'
 import { verifyTurnstile } from '@/lib/turnstile'
 
 const emailSchema = z.string().trim().email().max(254)
@@ -34,7 +35,7 @@ export async function subscribe(emailInput: string, turnstileToken: string | nul
   if (!await verifyTurnstile(turnstileToken, ip)) {
     return { success: false, message: 'Security check failed. Please try again.' }
   }
-  const limit = rateLimit(`newsletter:${ip}`, 5, 60 * 60 * 1000)
+  const limit = rateLimit(`newsletter:${hashIP(ip)}`, 5, 60 * 60 * 1000)
   if (!limit.ok) return { success: false, message: 'Too many requests. Please try again later.' }
 
   const payload = await getPayload({ config: await config })
