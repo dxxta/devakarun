@@ -11,6 +11,7 @@ import * as migration_20261115_150000_post_reactions_views from './20261115_1500
 import * as migration_20261115_160000_analytics from './20261115_160000_analytics';
 import * as migration_20261115_170000_profile_avatar_alt from './20261115_170000_profile_avatar_alt';
 import * as migration_20261115_180000_site_features from './20261115_180000_site_features';
+import * as migration_20261116_030000_posts_autosave from './20261116_030000_posts_autosave';
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20261115_180000_site_features.up,
     down: migration_20261115_180000_site_features.down,
     name: '20261115_180000_site_features',
+  },
+  {
+    up: migration_20261116_030000_posts_autosave.up,
+    down: migration_20261116_030000_posts_autosave.down,
+    name: '20261116_030000_posts_autosave',
   },
 ];
