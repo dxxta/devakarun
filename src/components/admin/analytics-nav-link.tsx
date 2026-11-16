@@ -1,5 +1,5 @@
 import { Link } from '@payloadcms/ui'
 
 export function AnalyticsNavLink() {
-  return <Link href="/admin/analytics">Analytics</Link>
+  return <Link href="/console/analytics">Analytics</Link>
 }

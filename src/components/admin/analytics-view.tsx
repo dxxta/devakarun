@@ -173,7 +173,7 @@ function SummaryCard({ title, value, metric, data, detail }: { title: string; va
         {detail ? <span style={{ color: 'var(--theme-elevation-700)', fontSize: 12 }}>{detail}</span> : null}
       </div>
       <Sparkline data={data} title={title} />
-      <Link data-share-ignore href={`/admin/analytics/${metric}`} style={{ color: 'var(--theme-text)', fontSize: 13, textDecoration: 'underline', textUnderlineOffset: 3 }}>View details</Link>
+      <Link data-share-ignore href={`/console/analytics/${metric}`} style={{ color: 'var(--theme-text)', fontSize: 13, textDecoration: 'underline', textUnderlineOffset: 3 }}>View details</Link>
     </article>
   )
 }
@@ -183,7 +183,7 @@ function RankingCard({ title, metric, rows }: { title: string; metric: Metric; r
     <section style={{ ...panelStyle, display: 'flex', flexDirection: 'column', alignItems: 'stretch', height: '100%', gap: 0 }}>
       <h2 style={{ margin: 0, fontSize: 17, color: 'var(--theme-text)' }}>{title}</h2>
       {rows.length ? <ol style={{ margin: '12px 0 0', padding: 0, listStyle: 'none', display: 'grid', alignContent: 'start', gap: 0, fontSize: 13 }}>{rows.slice(0, 7).map((row) => <li key={row.label} style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', gap: 8, padding: '6px 0' }}><span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.label}</span><strong style={{ flexShrink: 0 }}>{row.detail ?? row.count.toLocaleString('en')}</strong></li>)}</ol> : <p style={{ margin: '12px 0 0', ...mutedStyle }}>No data yet</p>}
-      <Link data-share-ignore href={`/admin/analytics/${metric}`} style={{ marginTop: 'auto', paddingTop: 12, color: 'var(--theme-text)', fontSize: 13, textDecoration: 'underline', textUnderlineOffset: 3 }}>View details</Link>
+      <Link data-share-ignore href={`/console/analytics/${metric}`} style={{ marginTop: 'auto', paddingTop: 12, color: 'var(--theme-text)', fontSize: 13, textDecoration: 'underline', textUnderlineOffset: 3 }}>View details</Link>
     </section>
   )
 }
@@ -197,7 +197,7 @@ function ChangeText({ current, previous }: { current: number; previous: number }
 }
 
 function RangeSelector({ metric, range, path }: { metric: Metric; range: number; path?: string }) {
-  const href = (value: number) => `/admin/analytics/${metric}?range=${value}${path ? `&path=${encodeURIComponent(path)}` : ''}`
+  const href = (value: number) => `/console/analytics/${metric}?range=${value}${path ? `&path=${encodeURIComponent(path)}` : ''}`
   return <nav aria-label="Analytics date range" data-share-ignore style={{ display: 'flex', gap: 12 }}>{[7, 30, 90].map((days) => <Link aria-current={range === days ? 'page' : undefined} href={href(days)} key={days} style={{ color: 'var(--theme-text)', fontWeight: range === days ? 700 : 400, textDecoration: 'underline', textUnderlineOffset: 3 }}>{days} days</Link>)}</nav>
 }
 
@@ -360,7 +360,7 @@ function tableRows(metric: Metric, data: AnalyticsData, selectedVisits: PageVisi
       const postID = postIDs.get(pagePath)
       const postViews = postID ? selectedViews.filter((row) => relationID(row.post) === postID).length : 0
       const reactions = postID ? data.reactions.filter((row) => relationID(row.post) === postID && row.createdAt >= data.currentStart).length : 0
-      return { key: pagePath, cells: [{ label: pagePath, href: `/admin/analytics/pages?range=${data.range}&path=${encodeURIComponent(pagePath)}` }, visits.length, unique, (visits.length / data.range).toFixed(1), topCountries, postID ? postViews : 'N/A', postID ? reactions : 'N/A'] } satisfies TableRow
+      return { key: pagePath, cells: [{ label: pagePath, href: `/console/analytics/pages?range=${data.range}&path=${encodeURIComponent(pagePath)}` }, visits.length, unique, (visits.length / data.range).toFixed(1), topCountries, postID ? postViews : 'N/A', postID ? reactions : 'N/A'] } satisfies TableRow
     }).sort((a, b) => Number(b.cells[1]) - Number(a.cells[1]))
     return { headers: ['Page', 'Visits', 'Unique visitors', 'Avg/day', 'Top countries', 'Post views', 'Reactions'], rows }
   }
@@ -418,7 +418,7 @@ function Detail({ metric, data, searchParams, shareDomain }: { metric: Metric; d
   const builtTable = tableRows(metric, data, currentRows, selectedViews, selectedContacts, selectedEvents, pagePath)
   const pageParam = searchParams?.page
   const page = Number(Array.isArray(pageParam) ? pageParam[0] : pageParam) || 1
-  const pageBase = `/admin/analytics/${metric}?range=${range}${pagePath ? `&path=${encodeURIComponent(pagePath)}` : ''}`
+  const pageBase = `/console/analytics/${metric}?range=${range}${pagePath ? `&path=${encodeURIComponent(pagePath)}` : ''}`
   const countries = countryRows(pagePath ? detailVisits : selectedVisits)
   const map = mapCounts(pagePath ? detailVisits : selectedVisits)
   const countryPie = countries.slice(0, 6).map((row) => ({ label: row.label, count: row.count }))
@@ -446,7 +446,7 @@ function Detail({ metric, data, searchParams, shareDomain }: { metric: Metric; d
       <ShareCaptureWatermark domain={shareDomain} />
       <div style={{ position: 'relative', zIndex: 1, display: 'grid', alignContent: 'start', gap: 18, paddingBottom: 32 }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', flexWrap: 'wrap', gap: 16 }}>
-        <div><Link data-share-ignore href="/admin" style={{ color: 'var(--theme-text)', textDecoration: 'underline', textUnderlineOffset: 3 }}>← Analytics dashboard</Link><h1 style={{ margin: '8px 0 0', color: 'var(--theme-text)' }}>{title}</h1></div>
+        <div><Link data-share-ignore href="/console" style={{ color: 'var(--theme-text)', textDecoration: 'underline', textUnderlineOffset: 3 }}>← Analytics dashboard</Link><h1 style={{ margin: '8px 0 0', color: 'var(--theme-text)' }}>{title}</h1></div>
         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}><RangeSelector metric={metric} path={pagePath} range={range} /><ShareImageButton range={range} targetId="analytics-share-capture" /></div>
       </header>
       <section style={panelStyle}><h2 style={{ margin: '0 0 8px', fontSize: 16 }}>Compared with the previous {range} days</h2><ChangeText current={totals.current} previous={previousCount} /></section>
@@ -498,12 +498,12 @@ async function renderAnalytics({ initPageResult, params, searchParams, user }: A
   return wrap(<Gutter>{metric ? <Detail data={data} metric={metric} searchParams={searchParams} shareDomain={shareDomain} /> : <Dashboard data={data} shareDomain={shareDomain} />}</Gutter>)
 }
 
-/** Custom admin routes (`/admin/analytics...`): rendered without Payload's template, so wrap it here. */
+/** Custom admin routes (`/console/analytics...`): rendered without Payload's template, so wrap it here. */
 export async function AnalyticsView(props: AdminViewServerProps) {
   return renderAnalytics(props, true)
 }
 
-/** Replaces the default dashboard at `/admin`: Payload already adds the template. */
+/** Replaces the default dashboard at `/console`: Payload already adds the template. */
 export async function AnalyticsDashboardView(props: AdminViewServerProps) {
   return renderAnalytics(props, false)
 }
