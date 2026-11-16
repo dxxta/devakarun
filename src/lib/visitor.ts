@@ -50,14 +50,24 @@ export function getVisitor(request: Request): VisitorIdentity {
   }
 }
 
+function expectedOrigins(request: Request): string[] {
+  const origins = new Set<string>([new URL(request.url).origin])
+  const host = (request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? '').split(',')[0].trim()
+  const proto = (request.headers.get('x-forwarded-proto') ?? '').split(',')[0].trim() || new URL(request.url).protocol.replace(':', '')
+  if (host) origins.add(`${proto}://${host}`)
+  try {
+    if (process.env.NEXT_PUBLIC_SITE_URL) origins.add(new URL(process.env.NEXT_PUBLIC_SITE_URL).origin)
+  } catch {}
+  return [...origins]
+}
+
 export function isSameOriginRequest(request: Request): boolean {
   const origin = request.headers.get('origin')
   const fetchSite = request.headers.get('sec-fetch-site')?.toLowerCase()
   if (fetchSite && fetchSite !== 'same-origin') return false
-  const expectedOrigin = new URL(request.url).origin
   if (origin) {
     try {
-      return new URL(origin).origin === expectedOrigin
+      return expectedOrigins(request).includes(new URL(origin).origin)
     } catch {
       return false
     }
