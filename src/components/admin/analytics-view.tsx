@@ -324,7 +324,7 @@ function Dashboard({ data, shareDomain }: { data: AnalyticsData; shareDomain: st
 function tableRows(metric: Metric, data: AnalyticsData, selectedVisits: PageVisit[], selectedViews: PostView[], selectedContacts: ContactMessage[], selectedEvents: AnalyticsEvent[], path?: string): { headers: string[]; rows: TableRow[] } {
   if (metric === 'contact') return {
     headers: ['Name', 'Email', 'Subject', 'Date', 'Record'],
-    rows: [...selectedContacts].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).map((row) => ({ key: String(row.id), cells: [row.name, maskedEmail(row.email), row.subject, new Date(row.createdAt).toLocaleString('en'), { label: 'Open', href: `/admin/collections/contact-messages/${row.id}` }] })),
+    rows: [...selectedContacts].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).map((row) => ({ key: String(row.id), cells: [row.name, maskedEmail(row.email), row.subject, new Date(row.createdAt).toLocaleString('en'), { label: 'Open', href: `/console/collections/contact-messages/${row.id}` }] })),
   }
   if (metric === 'rejected') return {
     headers: ['Reason', 'Path', 'Country', 'Date'],
