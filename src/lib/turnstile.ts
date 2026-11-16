@@ -13,7 +13,7 @@ export async function verifyTurnstile(token: string | null, ip?: string): Promis
   if (!secret) return false
 
   const body = new URLSearchParams({ secret, response: token })
-  if (ip) body.set('remoteip', ip)
+  if (ip && ip !== 'unknown') body.set('remoteip', ip)
 
   try {
     const response = await fetch(CLOUDFLARE_VERIFY_URL, {

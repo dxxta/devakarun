@@ -9,6 +9,7 @@ import { env } from '@/lib/env'
 import { rateLimit } from '@/lib/rate-limit'
 import { verifyTurnstile } from '@/lib/turnstile'
 import config from '@payload-config'
+import { getClientIP } from '@/lib/client-ip'
 
 const commentSchema = z.object({
   postId: z.number().int().positive(),
@@ -36,7 +37,7 @@ export async function addComment(
   if (!parsed.success) throw new Error('Enter a comment of up to 2,000 characters and complete the verification.')
 
   const requestHeaders = await headers()
-  const ip = requestHeaders.get('x-real-ip') || requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
+  const ip = getClientIP(requestHeaders)
   if (!await verifyTurnstile(parsed.data.turnstileToken, ip)) throw new Error('Verification failed. Please try again.')
 
   const limit = rateLimit(`commenter:${commenterId}`, 5, 10 * 60 * 1000)

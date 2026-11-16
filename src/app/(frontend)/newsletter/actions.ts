@@ -10,13 +10,14 @@ import { env } from '@/lib/env'
 import { rateLimit } from '@/lib/rate-limit'
 import { hashIP } from '@/lib/visitor'
 import { verifyTurnstile } from '@/lib/turnstile'
+import { getClientIP } from '@/lib/client-ip'
 
 const emailSchema = z.string().trim().email().max(254)
 
 async function clientIP(): Promise<string> {
   try {
     const requestHeaders = await headers()
-    return requestHeaders.get('x-real-ip') ?? requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+    return getClientIP(requestHeaders)
   } catch {
     return 'unknown'
   }

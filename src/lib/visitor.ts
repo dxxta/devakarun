@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto'
+import { getClientIP } from './client-ip'
 
 const oneYear = 60 * 60 * 24 * 365
 
@@ -37,9 +38,7 @@ export function getVisitor(request: Request): VisitorIdentity {
   const visitorID = savedID && /^[a-f0-9]{32}$/i.test(savedID) ? savedID : randomBytes(16).toString('hex')
   const now = new Date()
   const day = now.toISOString().slice(0, 10)
-  const ip = request.headers.get('x-real-ip')?.trim()
-    || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || 'unknown'
+  const ip = getClientIP(request.headers)
 
   return {
     visitorHash: sha256(`${salt}:visitor:${visitorID}`),

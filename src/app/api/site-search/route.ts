@@ -4,6 +4,7 @@ import config from '@payload-config'
 import { rateLimit } from '@/lib/rate-limit'
 import { hashIP } from '@/lib/visitor'
 import type { Search } from '@/payload-types'
+import { getClientIP } from '@/lib/client-ip'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,9 +21,7 @@ function sanitizeQuery(value: string | null) {
 
 export async function GET(request: Request) {
   const requestHeaders = await headers()
-  const ip = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || requestHeaders.get('x-real-ip')
-    || 'unknown'
+  const ip = getClientIP(requestHeaders)
   const rate = rateLimit(`site-search:${hashIP(ip)}`, RATE_LIMIT, RATE_WINDOW_MS)
 
   if (!rate.ok) {

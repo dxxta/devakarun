@@ -9,6 +9,7 @@ import { rateLimit } from '@/lib/rate-limit'
 import { hashIP } from '@/lib/visitor'
 import { recordRejectedContact } from '@/lib/contact-analytics'
 import { verifyTurnstile } from '@/lib/turnstile'
+import { getClientIP } from '@/lib/client-ip'
 
 const contactSchema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -22,7 +23,7 @@ const contactSchema = z.object({
 async function clientIP(): Promise<string> {
   try {
     const requestHeaders = await headers()
-    return requestHeaders.get('x-real-ip') ?? requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+    return getClientIP(requestHeaders)
   } catch {
     return 'unknown'
   }

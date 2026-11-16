@@ -57,6 +57,7 @@ service hostname `postgres`, and its database, username, and password must match
 | `GITHUB_TOKEN` | Optional | GitHub API token for repository metadata, README files, and demo images; raises the API rate limit. |
 | `CRON_SECRET` | Optional | Shared secret for scheduled GitHub project sync requests. |
 | `SEED_CONTENT` | Optional | Set to `false` to disable automatic first-boot seeding (portfolio, gallery and blog). |
+| `CLOUDFLARE_PROXY` | Optional | `true` reads the visitor IP from `CF-Connecting-IP` (site behind the Cloudflare proxy), `false` uses `x-real-ip` / `x-forwarded-for`. When empty it is on if `CLOUDFLARE_IMAGES=true` or both Turnstile keys are set. Lock the origin to Cloudflare's IP ranges so the header cannot be forged. |
 | `SEED_ALL` | Optional | Set to `true` for one deploy to run all seeds (portfolio, gallery, blog) even when content exists. It resets portfolio content to the seed values, so remove it after that boot. |
 
 The app requires all six variables marked Yes for startup. Add SMTP,
